@@ -53,7 +53,10 @@ table {
   box-sizing: border-box;
 }
 body {
+  font-weight: 300;
   font-family: 'Source Sans Pro', sans-serif;
+  color: ${(props) => props.theme.white.darker};
+  background-color: black;
 }
 h1 {
   font-family: "Roboto Slab", serif;

@@ -50,16 +50,6 @@ const Item = styled.li`
   }
 `;
 
-const Search = styled.span`
-  color: white;
-  svg {
-    height: 25px;
-  }
-  display: flex;
-  align-items: center;
-  position: relative;
-`;
-
 const Circle = styled(motion.span)`
   position: absolute;
   bottom: -10px;
@@ -72,17 +62,30 @@ const Circle = styled(motion.span)`
   margin: 0 auto;
 `;
 
+const Search = styled.div`
+  color: white;
+  display: flex;
+  align-items: center;
+  position: relative;
+  svg {
+    height: 25px;
+  }
+`;
+
 const Input = styled(motion.input)`
   position: absolute;
-  right: 0px;
+  right: 0;
   transform-origin: right center;
-  background-color: transparent;
+  background-color: black;
   color: white;
   border: 1px solid ${(props) => props.theme.white.lighter};
   padding: 5px 10px;
   padding-left: 30px;
-  z-index: -1;
   font-size: 14px;
+  z-index: -1;
+`;
+
+const MagnifierSvg = styled(motion.svg)`
 `;
 
 const logoVariants: Variants = {
@@ -98,7 +101,7 @@ const logoVariants: Variants = {
 };
 
 const navVariant: Variants = {
-  top: { backgroundColor: "rgba(0, 0, 0, 0)" },
+  top: { backgroundColor: "rgba(0, 0, 0, 0.1)" },
   scroll: { backgroundColor: "rgba(0, 0, 0, 1)" },
 };
 
@@ -131,7 +134,7 @@ function Header() {
       <Col>
         <Logo
           variants={logoVariants}
-          initial="initial"
+          animate="initial"
           whileHover="active"
           xmlns="http://www.w3.org/2000/svg"
           width="1024"
@@ -153,7 +156,7 @@ function Header() {
       </Col>
       <Col>
         <Search>
-          <motion.svg
+          <MagnifierSvg
             onClick={toggleSearch}
             animate={{ x: searchOpen ? -182 : 0 }}
             transition={{ type: "linear" }}
@@ -166,9 +169,9 @@ function Header() {
               d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
               clipRule="evenodd"
             ></path>
-          </motion.svg>
+          </MagnifierSvg>
           <Input
-            initial={{ scale: 0 }}
+            initial={{ scaleX: 0 }}
             animate={inputAnimation}
             transition={{ type: "linear" }}
             placeholder="Search for movie or tv show..."

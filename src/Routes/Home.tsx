@@ -1,6 +1,7 @@
 import { AnimatePresence, motion, Variants } from "framer-motion";
 import { useState } from "react";
 import { useQuery } from "react-query";
+import { useMatch, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { getMovies, IGetMoviesResult } from "../api";
 import { makeImagePath } from "../utils";
@@ -80,6 +81,18 @@ const Info = styled(motion.div)`
   }
 `;
 
+const MovieModal = styled(motion.div)`
+  position: absolute;
+  width: 40vw;
+  height: 80vh;
+  background-color: black;
+  top: 50px;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+`;
+
+
 const rowVariants: Variants = {
   hidden: {
     x: window.outerWidth + 5, // 5 for gap
@@ -124,12 +137,14 @@ const NEFLIX_LOGO_URL =
   "https://assets.brand.microsites.netflix.io/assets/2800a67c-4252-11ec-a9ce-066b49664af6_cm_800w.jpg?v=4";
 
 function Home() {
+  const navigate = useNavigate();
+  const moviePathMatch = useMatch("/movie/:movieId");
+  const [index, setIndex] = useState(0);
+  const [leaving, setLeaving] = useState(false);
   const { data, isLoading } = useQuery<IGetMoviesResult>(
     ["movies", "nowPlaying"],
     getMovies
   );
-  const [index, setIndex] = useState(0);
-  const [leaving, setLeaving] = useState(false);
   const totalMovies = data?.results;
   const increaseIndex = () => {
     if (totalMovies) {
@@ -141,6 +156,9 @@ function Home() {
     }
   };
   const toggleLeaving = () => setLeaving((prev) => !prev);
+  const onBoxClicked = (movieId: number) => {
+    navigate(`/movie/${movieId}`);
+  };
   return (
     <Wrapper>
       {isLoading ? (
@@ -173,12 +191,14 @@ function Home() {
                       : NEFLIX_LOGO_URL;
                     return (
                       <Box
+                        layoutId={movie.id.toString()}
                         key={movie.id}
                         bgPhoto={backDropPath}
                         variants={boxVariants}
                         initial="normal"
                         whileHover="hover"
                         transition={{ type: "tween" }}
+                        onClick={() => onBoxClicked(movie.id)}
                       >
                         <Info variants={infoVariants}>
                           <h4>{movie.title}</h4>
@@ -189,6 +209,11 @@ function Home() {
               </Row>
             </AnimatePresence>
           </Slider>
+          <AnimatePresence>
+            {moviePathMatch && (
+              <MovieModal layoutId={moviePathMatch.params.movieId} />
+            )}
+          </AnimatePresence>
         </>
       )}
     </Wrapper>

@@ -81,6 +81,15 @@ const Info = styled(motion.div)`
   }
 `;
 
+const Overlay = styled(motion.div)`
+  position: absolute;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  opacity: 0;
+`;
+
 const MovieModal = styled(motion.div)`
   position: absolute;
   width: 40vw;
@@ -159,6 +168,9 @@ function Home() {
   const onBoxClicked = (movieId: number) => {
     navigate(`/movie/${movieId}`);
   };
+  const onOverlayClicked = () => {
+    navigate(".");
+  };
   return (
     <Wrapper>
       {isLoading ? (
@@ -211,7 +223,10 @@ function Home() {
           </Slider>
           <AnimatePresence>
             {moviePathMatch && (
-              <MovieModal layoutId={moviePathMatch.params.movieId} />
+              <>
+                <Overlay onClick={onOverlayClicked} animate={{ opacity: 1 }} />
+                <MovieModal layoutId={moviePathMatch.params.movieId} />
+              </>
             )}
           </AnimatePresence>
         </>

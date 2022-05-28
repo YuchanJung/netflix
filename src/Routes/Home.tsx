@@ -1,4 +1,9 @@
-import { AnimatePresence, motion, Variants } from "framer-motion";
+import {
+  AnimatePresence,
+  motion,
+  useViewportScroll,
+  Variants,
+} from "framer-motion";
 import { useState } from "react";
 import { useQuery } from "react-query";
 import { useMatch, useNavigate } from "react-router-dom";
@@ -82,7 +87,7 @@ const Info = styled(motion.div)`
 `;
 
 const Overlay = styled(motion.div)`
-  position: absolute;
+  position: fixed;
   top: 0;
   width: 100%;
   height: 100%;
@@ -90,17 +95,16 @@ const Overlay = styled(motion.div)`
   opacity: 0;
 `;
 
-const MovieModal = styled(motion.div)`
+const MovieModal = styled(motion.div)<{ scrollY: number }>`
   position: absolute;
   width: 40vw;
   height: 80vh;
-  background-color: black;
-  top: 50px;
+  background-color: rgba(0, 0, 0, 0.8);
+  top: ${(props) => props.scrollY + 100}px;
   left: 0;
   right: 0;
   margin: 0 auto;
 `;
-
 
 const rowVariants: Variants = {
   hidden: {
@@ -148,6 +152,7 @@ const NEFLIX_LOGO_URL =
 function Home() {
   const navigate = useNavigate();
   const moviePathMatch = useMatch("/movie/:movieId");
+  const { scrollY } = useViewportScroll();
   const [index, setIndex] = useState(0);
   const [leaving, setLeaving] = useState(false);
   const { data, isLoading } = useQuery<IGetMoviesResult>(
@@ -160,7 +165,7 @@ function Home() {
       if (leaving) return;
       toggleLeaving();
       const totalLength = totalMovies.length - 1;
-      const maxIndex = Math.floor(totalLength / offset) - 1; 
+      const maxIndex = Math.floor(totalLength / offset) - 1;
       setIndex((prev) => (maxIndex === prev ? 0 : prev + 1));
     }
   };
@@ -224,8 +229,15 @@ function Home() {
           <AnimatePresence>
             {moviePathMatch && (
               <>
-                <Overlay onClick={onOverlayClicked} animate={{ opacity: 1 }} />
-                <MovieModal layoutId={moviePathMatch.params.movieId} />
+                <Overlay
+                  onClick={onOverlayClicked}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                />
+                <MovieModal
+                  layoutId={moviePathMatch.params.movieId}
+                  scrollY={scrollY.get()}
+                />
               </>
             )}
           </AnimatePresence>

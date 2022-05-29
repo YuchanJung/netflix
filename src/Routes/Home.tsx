@@ -99,11 +99,33 @@ const MovieModal = styled(motion.div)<{ scrollY: number }>`
   position: absolute;
   width: 40vw;
   height: 80vh;
-  background-color: rgba(0, 0, 0, 0.8);
+  background-color: ${(props) => props.theme.black.lighter};
   top: ${(props) => props.scrollY + 100}px;
   left: 0;
   right: 0;
   margin: 0 auto;
+  border-radius: 15px;
+  overflow: hidden;
+`;
+
+const ModalCover = styled.div`
+  width: 100%;
+  background-size: cover;
+  background-position: center center;
+  height: 400px;
+`;
+
+const ModalTitle = styled.h2`
+  font-size: 36px;
+  position: relative;
+  top: -80px;
+  padding: 20px;
+`;
+
+const ModalOverview = styled.p`
+  position: relative;
+  top: -80px;
+  padding: 20px;
 `;
 
 const rowVariants: Variants = {
@@ -176,6 +198,11 @@ function Home() {
   const onOverlayClicked = () => {
     navigate(".");
   };
+  const clickedMovie =
+    moviePathMatch?.params.movieId &&
+    data?.results.find(
+      (movie) => String(movie.id) === moviePathMatch.params.movieId
+    );
   return (
     <Wrapper>
       {isLoading ? (
@@ -237,7 +264,24 @@ function Home() {
                 <MovieModal
                   layoutId={moviePathMatch.params.movieId}
                   scrollY={scrollY.get()}
-                />
+                >
+                  {clickedMovie && (
+                    <>
+                      <ModalCover
+                        style={{
+                          backgroundImage: `
+                          linear-gradient(to top, black, transparent), 
+                          url(${makeImagePath(
+                            clickedMovie.backdrop_path,
+                            "w500"
+                          )})`,
+                        }}
+                      ></ModalCover>
+                      <ModalTitle>{clickedMovie.title}</ModalTitle>
+                      <ModalOverview>{clickedMovie.overview}</ModalOverview>
+                    </>
+                  )}
+                </MovieModal>
               </>
             )}
           </AnimatePresence>

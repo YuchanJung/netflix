@@ -100,7 +100,7 @@ const MovieModal = styled(motion.div)<{ scrollY: number }>`
   width: 40vw;
   height: 80vh;
   background-color: ${(props) => props.theme.black.lighter};
-  top: ${(props) => props.scrollY + 100}px;
+  top: ${(props) => props.scrollY + 50}px;
   left: 0;
   right: 0;
   margin: 0 auto;

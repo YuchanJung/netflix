@@ -1,7 +1,10 @@
 const API_KEY = "800d88957dfd217f6c143b6757ed5639";
 const BASE_PATH = "https://api.themoviedb.org/3/";
 
-interface IMovie {
+export const NEFLIX_LOGO_URL =
+  "https://assets.brand.microsites.netflix.io/assets/2800a67c-4252-11ec-a9ce-066b49664af6_cm_800w.jpg?v=4";
+
+export interface IMovie {
   id: number;
   backdrop_path: string;
   poster_path: string;

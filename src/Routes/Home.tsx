@@ -73,7 +73,7 @@ function Home() {
             <Overview>{data?.results[0].overview}</Overview>
           </Banner>
           <SliderContents>
-            <Slider movies={totalMovies} />
+            {totalMovies && <Slider movies={totalMovies} />}
           </SliderContents>
           <AnimatePresence>
             {clickedMovie && (

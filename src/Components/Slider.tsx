@@ -17,11 +17,10 @@ const Wrapper = styled.div`
 
 const Row = styled(motion.div)<{ windowInnerWidth: number }>`
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  grid-template-columns: repeat(8, 1fr);
   /* grid-template-columns: repeat(${(props) =>
     Math.floor(props.windowInnerWidth / 210)}, 1fr); */
   gap: 5px;
-  width: 100%;
   position: absolute;
 `;
 
@@ -30,13 +29,13 @@ const Box = styled(motion.div)<{ bgPhoto: string }>`
   background-image: url(${(props) => props.bgPhoto});
   background-size: cover;
   background-position: center center;
-  width: 210px;
-  height: 140px;
+  width: 180px;
+  height: 120px;
   font-size: 36px;
-  &:first-child {
+  &:nth-child(2) {
     transform-origin: center left;
   }
-  &:last-child {
+  &:nth-child(7) {
     transform-origin: center right;
   }
 `;
@@ -54,32 +53,38 @@ const Info = styled(motion.div)`
   }
 `;
 
-const Button = styled.button`
-  width: 30px;
-  height: 30px;
+const Overlay = styled.button`
   display: flex;
   justify-content: center;
   align-items: center;
   position: absolute;
+  width: 75px;
+  height: 120px;
+  background-color: rgba(0, 0, 0, 0.5);
   color: white;
+  z-index: 1;
+  cursor: pointer;
   &:first-child {
-    left: 15px;
+    left: 0;
   }
   &:last-child {
-    right: 15px;
+    right: 0;
   }
 `;
 
 const rowVariants: Variants = {
-  hidden: {
-    x: window.outerWidth + 5, // 5 for gap
-  },
+  hidden: (direction: "left" | "right") => ({
+    x:
+      direction === "left" ? -window.outerWidth + 170 : window.outerWidth - 170,
+  }),
   visible: {
     x: 0,
   },
-  exit: {
-    x: -window.outerWidth - 5,
-  },
+  exit: (direction: "left" | "right") => ({
+    x:
+      direction === "left" ? window.outerWidth - 170 : -window.outerWidth + 170,
+  }),
+  // 170 have to be changed responsively
 };
 
 const boxVariants: Variants = {
@@ -122,8 +127,10 @@ function returnMovies(movies: IMovie[], index: number, offset: number) {
     movies[index === 0 ? (maxIndex + 1) * offset - 1 : index * offset - 1];
   const lastPreviewMovie =
     movies[index === maxIndex ? 0 : (index + 1) * offset];
-  const currentMovies = movies.slice(offset * index, offset * index + offset);
-  return { currentMovies, firstPreviewMovie, lastPreviewMovie };
+  let currentMovies = movies.slice(offset * index, offset * index + offset);
+  currentMovies.splice(0, 0, firstPreviewMovie);
+  currentMovies.push(lastPreviewMovie);
+  return currentMovies;
 }
 
 function Slider({ movies }: ISliderProps) {
@@ -135,37 +142,44 @@ function Slider({ movies }: ISliderProps) {
   const navigate = useNavigate();
   const [index, setIndex] = useState(0);
   const [animationRunning, setAnimationRunning] = useState(false);
+  const [direction, setDirection] = useState<"left" | "right">("right");
   const onBoxClicked = (movieId: number) => {
     navigate(`/movie/${movieId}`);
   };
   const toggleAnimationRunning = () => setAnimationRunning((prev) => !prev);
   const totalLength = movies.length - 1;
   const maxIndex = Math.floor(totalLength / offset) - 1;
-  const changeIndex = () => {
+  const changeIndex = (direction: "left" | "right") => {
     if (movies) {
       if (animationRunning) return; // to prevent a bug that occurs when button is clicked too fast
       toggleAnimationRunning();
-      setIndex((prev) => (maxIndex === prev ? 0 : prev + 1));
+      setDirection(direction);
+      if (direction === "right") {
+        setIndex((prev) => (prev === maxIndex ? 0 : prev + 1));
+      } else {
+        setIndex((prev) => (prev === 0 ? maxIndex : prev - 1));
+      }
     }
   };
-  const { currentMovies, firstPreviewMovie, lastPreviewMovie } = returnMovies(
-    movies,
-    index,
-    offset
-  );
+  const currentMovies = returnMovies(movies, index, offset);
   return (
     <Wrapper>
-      <Button>
+      <Overlay onClick={() => changeIndex("left")}>
         <AngleIcon direction="left" className="prevSlide" />
-      </Button>
-      <AnimatePresence initial={false} onExitComplete={toggleAnimationRunning}>
+      </Overlay>
+      <AnimatePresence
+        custom={direction}
+        initial={false}
+        onExitComplete={toggleAnimationRunning}
+      >
         <Row
           windowInnerWidth={window.innerWidth}
+          custom={direction}
           variants={rowVariants}
           initial="hidden"
           animate="visible"
           exit="exit"
-          transition={{ type: "tween", duration: 1 }}
+          transition={{ type: "tween", duration: 0.6 }}
           key={index}
         >
           {currentMovies.map((movie) => {
@@ -191,9 +205,9 @@ function Slider({ movies }: ISliderProps) {
           })}
         </Row>
       </AnimatePresence>
-      <Button onClick={changeIndex}>
+      <Overlay onClick={() => changeIndex("right")}>
         <AngleIcon direction="right" className="nextSlide" />
-      </Button>
+      </Overlay>
     </Wrapper>
   );
 }

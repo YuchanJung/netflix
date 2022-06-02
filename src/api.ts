@@ -23,7 +23,11 @@ export interface IGetMoviesResult {
   total_results: number;
 }
 
-export function getMovies() {
+export function getNowPlayingMovies() {
   return fetch(`${BASE_PATH}movie/now_playing?api_key=${API_KEY}&language=en-US&page=1&region=kr
   `).then((response) => response.json());
+}
+
+export function getUpcomingMovies() {
+  return fetch(`${BASE_PATH}movie/upcoming?api_key=${API_KEY}&language=en-US&page=1&region=kr`)
 }

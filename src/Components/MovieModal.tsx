@@ -1,5 +1,5 @@
-import { motion } from "framer-motion";
-import { useNavigate } from "react-router-dom";
+import { AnimatePresence, motion } from "framer-motion";
+import { useMatch, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { IMovie } from "../api";
 import { makeImagePath } from "../utils";
@@ -13,12 +13,12 @@ const Overlay = styled(motion.div)`
   opacity: 0;
 `;
 
-const Modal = styled(motion.div)<{ scrollY: number }>`
+const Modal = styled(motion.div)<{ scrolly: number }>`
   position: absolute;
   width: 40vw;
   height: 80vh;
   background-color: ${(props) => props.theme.black.lighter};
-  top: ${(props) => props.scrollY + 50}px;
+  top: ${(props) => props.scrolly + 50}px;
   left: 0;
   right: 0;
   margin: 0 auto;
@@ -47,38 +47,52 @@ const Overview = styled.p`
 `;
 
 interface IMovieModal {
-  clickedMovie: IMovie;
-  scrollY: number;
+  totalMovies: IMovie[];
+  scrolly: number;
 }
 
-function MovieModal({ clickedMovie, scrollY }: IMovieModal) {
+function MovieModal({ totalMovies, scrolly }: IMovieModal) {
+  const moviePathMatch = useMatch("/movie/:movieId");
   const navigate = useNavigate();
   const onOverlayClicked = () => {
     navigate(".");
   };
+  const clickedMovie =
+    moviePathMatch?.params.movieId &&
+    totalMovies.find(
+      (movie) => String(movie.id) === moviePathMatch.params.movieId
+    );
+  console.log("moviemodal: ", scrolly);
   return (
-    <>
-      <Overlay
-        onClick={onOverlayClicked}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-      />
-      <Modal layoutId={clickedMovie.id.toString()} scrollY={scrollY}>
-        {clickedMovie && (
-          <>
-            <Cover
-              style={{
-                backgroundImage: `
-                linear-gradient(to top, black, transparent), 
-                url(${makeImagePath(clickedMovie.backdrop_path, "w500")})`,
-              }}
-            ></Cover>
-            <Title>{clickedMovie.title}</Title>
-            <Overview>{clickedMovie.overview}</Overview>
-          </>
-        )}
-      </Modal>
-    </>
+    <AnimatePresence>
+      {clickedMovie && (
+        <>
+          <Overlay
+            onClick={onOverlayClicked}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          />
+          <Modal layoutId={clickedMovie.id.toString()} scrolly={scrolly}>
+            {clickedMovie && (
+              <>
+                <Cover
+                  style={{
+                    backgroundImage: `
+                      linear-gradient(to top, black, transparent), 
+                      url(${makeImagePath(
+                        clickedMovie.backdrop_path,
+                        "w500"
+                      )})`,
+                  }}
+                ></Cover>
+                <Title>{clickedMovie.title}</Title>
+                <Overview>{clickedMovie.overview}</Overview>
+              </>
+            )}
+          </Modal>
+        </>
+      )}
+    </AnimatePresence>
   );
 }
 

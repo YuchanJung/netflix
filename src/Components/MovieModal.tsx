@@ -62,7 +62,6 @@ function MovieModal({ totalMovies, scrolly }: IMovieModal) {
     totalMovies.find(
       (movie) => String(movie.id) === moviePathMatch.params.movieId
     );
-  console.log("moviemodal: ", scrolly);
   return (
     <AnimatePresence>
       {clickedMovie && (

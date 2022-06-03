@@ -62,9 +62,8 @@ const Overlay = styled.button`
   height: 140px;
   background-color: rgba(0, 0, 0, 0.5);
   color: white;
-  z-index: 1;
   cursor: pointer;
-  &:first-child {
+  &:nth-child(2) {
     padding-right: 20px;
     left: 0;
   }
@@ -166,9 +165,6 @@ function Slider({ movies }: ISliderProps) {
   const currentMovies = returnMovies(movies, index, offset);
   return (
     <Wrapper>
-      <Overlay onClick={() => changeIndex("left")}>
-        <AngleIcon direction="left" className="prevSlide" />
-      </Overlay>
       <AnimatePresence
         custom={direction}
         initial={false}
@@ -207,6 +203,9 @@ function Slider({ movies }: ISliderProps) {
           })}
         </Row>
       </AnimatePresence>
+      <Overlay onClick={() => changeIndex("left")}>
+        <AngleIcon direction="left" className="prevSlide" />
+      </Overlay>
       <Overlay onClick={() => changeIndex("right")}>
         <AngleIcon direction="right" className="nextSlide" />
       </Overlay>

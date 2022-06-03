@@ -1,4 +1,5 @@
-import { useViewportScroll } from "framer-motion";
+import { motion, useViewportScroll } from "framer-motion";
+import { useEffect, useState } from "react";
 import { useQuery } from "react-query";
 import styled from "styled-components";
 import { getNowPlayingMovies, IGetMoviesResult } from "../api";
@@ -19,7 +20,7 @@ const Loader = styled.div`
   align-items: center;
 `;
 
-const Banner = styled.div<{ bgphoto: string }>`
+const Banner = styled(motion.div)<{ bgphoto: string }>`
   height: 100vh;
   display: flex;
   flex-direction: column;
@@ -52,18 +53,19 @@ const SliderContents = styled.div`
 
 function Home() {
   const { scrollY } = useViewportScroll();
-  /*
+  const [scrollYProps, setScrollYProps] = useState(0);
   const { data, isLoading } = useQuery<IGetMoviesResult>(
     ["movies", "nowPlaying"],
     getNowPlayingMovies
   );
   const totalMovies = data?.results;
-  */
-  console.log("home: ", scrollY.get());
+  useEffect(() => {
+    scrollY.onChange((v) => setScrollYProps(v));
+  }, [scrollY]);
   return (
     <Wrapper>
-      {/*isLoading ? (
-      {  <Loader>Loading...</Loader>
+      {isLoading ? (
+        <Loader>Loading...</Loader>
       ) : (
         <>
           <Banner bgphoto={makeImagePath(data?.results[0].backdrop_path || "")}>
@@ -74,11 +76,10 @@ function Home() {
             {totalMovies && <Slider movies={totalMovies} />}
           </SliderContents>
           {totalMovies && (
-            <MovieModal totalMovies={totalMovies} scrolly={scrollY.get()} />
+            <MovieModal totalMovies={totalMovies} scrolly={scrollYProps} />
           )}
         </>
-          )}*/}
-
+      )}
     </Wrapper>
   );
 }

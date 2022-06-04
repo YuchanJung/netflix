@@ -47,11 +47,11 @@ const Overview = styled.p`
 `;
 
 interface IMovieModal {
-  totalMovies: IMovie[];
+  allMovies: IMovie[];
   scrolly: number;
 }
 
-function MovieModal({ totalMovies, scrolly }: IMovieModal) {
+function MovieModal({ allMovies, scrolly }: IMovieModal) {
   const moviePathMatch = useMatch("/movie/:movieId");
   const navigate = useNavigate();
   const onOverlayClicked = () => {
@@ -59,7 +59,7 @@ function MovieModal({ totalMovies, scrolly }: IMovieModal) {
   };
   const clickedMovie =
     moviePathMatch?.params.movieId &&
-    totalMovies.find(
+    allMovies.find(
       (movie) => String(movie.id) === moviePathMatch.params.movieId
     );
   return (

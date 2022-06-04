@@ -63,7 +63,7 @@ const Overlay = styled.button`
   background-color: rgba(0, 0, 0, 0.5);
   color: white;
   cursor: pointer;
-  &:nth-child(2) {
+  &:nth-last-child(2) {
     padding-right: 20px;
     left: 0;
   }
@@ -74,16 +74,20 @@ const Overlay = styled.button`
 `;
 
 const rowVariants: Variants = {
-  hidden: (direction: "left" | "right") => ({
+  hidden: (props: IRowVariantsProps) => ({
     x:
-      direction === "left" ? -window.outerWidth + 200 : window.outerWidth - 200,
+      props.direction === "left"
+        ? -window.outerWidth + props.animationLength
+        : window.outerWidth - props.animationLength,
   }),
   visible: {
     x: 0,
   },
-  exit: (direction: "left" | "right") => ({
+  exit: (props: IRowVariantsProps) => ({
     x:
-      direction === "left" ? window.outerWidth - 200 : -window.outerWidth + 200,
+      props.direction === "left"
+        ? window.outerWidth - props.animationLength
+        : -window.outerWidth + props.animationLength,
   }),
   // 170 have to be changed responsively
 };
@@ -118,17 +122,26 @@ interface ISliderProps {
   movies: IMovie[];
 }
 
+interface IRowVariantsProps {
+  direction: "left" | "right";
+  animationLength: number;
+}
 // const offset = 6;
 
-function returnMovies(movies: IMovie[], index: number, offset: number) {
-  movies = movies.slice(1); // remove the first movie which was used for banner
-  const totalLength = movies.length - 1;
-  const maxIndex = Math.floor(totalLength / offset) - 1;
+function returnCurrentMovies(movies: IMovie[], index: number, offset: number) {
+  // movies = movies.slice(1); // remove the first movie which was used for banner
+  const totalLength = movies.length;
+  const maxIndex = Math.ceil(totalLength / offset) - 1;
+  const remainder = (maxIndex + 1) * offset - totalLength;
   const firstPreviewMovie =
-    movies[index === 0 ? (maxIndex + 1) * offset - 1 : index * offset - 1];
+    movies[index === 0 ? totalLength - 1 : index * offset - 1];
   const lastPreviewMovie =
-    movies[index === maxIndex ? 0 : (index + 1) * offset];
+    movies[index === maxIndex ? remainder : (index + 1) * offset];
   let currentMovies = movies.slice(offset * index, offset * index + offset);
+  if (index === maxIndex) {
+    const remainderMovies = movies.slice(0, remainder);
+    currentMovies.push(...remainderMovies);
+  }
   currentMovies.splice(0, 0, firstPreviewMovie);
   currentMovies.push(lastPreviewMovie);
   return currentMovies;
@@ -143,36 +156,56 @@ function Slider({ movies }: ISliderProps) {
   const navigate = useNavigate();
   const [index, setIndex] = useState(0);
   const [animationRunning, setAnimationRunning] = useState(false);
+  const [animationLength, setAnimationLength] = useState(200);
   const [direction, setDirection] = useState<"left" | "right">("right");
+  const totalLength = movies.length;
+  const maxIndex = Math.ceil(totalLength / offset) - 1;
+  const remainder = (maxIndex + 1) * offset - totalLength;
+  const rowVariantsProps: IRowVariantsProps = {
+    direction,
+    animationLength,
+  };
+  const currentMovies = returnCurrentMovies(movies, index, offset);
   const onBoxClicked = (movieId: number) => {
     navigate(`/movie/${movieId}`);
   };
   const toggleAnimationRunning = () => setAnimationRunning((prev) => !prev);
-  const totalLength = movies.length - 1;
-  const maxIndex = Math.floor(totalLength / offset) - 1;
   const changeIndex = (direction: "left" | "right") => {
     if (movies) {
       if (animationRunning) return; // to prevent a bug that occurs when button is clicked too fast
       toggleAnimationRunning();
       setDirection(direction);
       if (direction === "right") {
-        setIndex((prev) => (prev === maxIndex ? 0 : prev + 1));
+        setIndex((prev) => {
+          if (prev === maxIndex) {
+            setAnimationLength(210 * (remainder + 1) - 10);
+            return 0;
+          }
+          setAnimationLength(200);
+          return prev + 1;
+        });
       } else {
-        setIndex((prev) => (prev === 0 ? maxIndex : prev - 1));
+        setIndex((prev) => {
+          if (prev === 0) {
+            setAnimationLength(210 * (remainder + 1) - 10);
+            return maxIndex;
+          }
+          setAnimationLength(200);
+          return prev - 1;
+        });
       }
     }
   };
-  const currentMovies = returnMovies(movies, index, offset);
   return (
     <Wrapper>
       <AnimatePresence
-        custom={direction}
+        custom={rowVariantsProps}
         initial={false}
         onExitComplete={toggleAnimationRunning}
       >
         <Row
           windowinnerwidth={window.innerWidth}
-          custom={direction}
+          custom={rowVariantsProps}
           variants={rowVariants}
           initial="hidden"
           animate="visible"

@@ -53,14 +53,14 @@ const SliderContents = styled.div`
 
 function Home() {
   const { scrollY } = useViewportScroll();
-  const [scrollYProps, setScrollYProps] = useState(0);
+  const [scrolledYPosition, setScrolledYPosition] = useState(0);
   const { data, isLoading } = useQuery<IGetMoviesResult>(
     ["movies", "nowPlaying"],
     getNowPlayingMovies
   );
   const totalMovies = data?.results;
   useEffect(() => {
-    scrollY.onChange((v) => setScrollYProps(v));
+    scrollY.onChange((v) => setScrolledYPosition(v));
   }, [scrollY]);
   return (
     <Wrapper>
@@ -73,10 +73,10 @@ function Home() {
             <Overview>{data?.results[0].overview}</Overview>
           </Banner>
           <SliderContents>
-            {totalMovies && <Slider movies={totalMovies} />}
+            {totalMovies && <Slider movies={totalMovies.slice(1)} />} 
           </SliderContents>
           {totalMovies && (
-            <MovieModal totalMovies={totalMovies} scrolly={scrollYProps} />
+            <MovieModal totalMovies={totalMovies} scrolly={scrolledYPosition} />
           )}
         </>
       )}

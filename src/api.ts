@@ -29,5 +29,7 @@ export function getNowPlayingMovies() {
 }
 
 export function getUpcomingMovies() {
-  return fetch(`${BASE_PATH}movie/upcoming?api_key=${API_KEY}&language=en-US&page=1&region=kr`)
+  return fetch(
+    `${BASE_PATH}movie/upcoming?api_key=${API_KEY}&language=en-US&page=1&region=kr`
+  ).then((response) => response.json());
 }

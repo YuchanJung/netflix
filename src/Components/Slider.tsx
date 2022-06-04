@@ -1,4 +1,5 @@
 import { AnimatePresence, motion, Variants } from "framer-motion";
+import React from "react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
@@ -8,7 +9,7 @@ import AngleIcon from "./Icons/AngleIcon";
 
 const Wrapper = styled.div`
   width: 100%;
-  height: 30vh;
+  height: 25vh;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -178,19 +179,19 @@ function Slider({ movies }: ISliderProps) {
       if (direction === "right") {
         setIndex((prev) => {
           if (prev === maxIndex) {
-            setAnimationLength(210 * (remainder + 1) - 10);
+            setAnimationLength(205 + 215 * remainder);
             return 0;
           }
-          setAnimationLength(200);
+          setAnimationLength(205);
           return prev + 1;
         });
       } else {
         setIndex((prev) => {
           if (prev === 0) {
-            setAnimationLength(210 * (remainder + 1) - 10);
+            setAnimationLength(205 + 215 * remainder);
             return maxIndex;
           }
-          setAnimationLength(200);
+          setAnimationLength(205);
           return prev - 1;
         });
       }
@@ -211,7 +212,7 @@ function Slider({ movies }: ISliderProps) {
           animate="visible"
           exit="exit"
           transition={{ type: "tween", duration: 0.6 }}
-          key={index}
+          key={index} // do i need keyword of slider ?
         >
           {currentMovies.map((movie) => {
             const backDropPath = movie.backdrop_path
@@ -219,7 +220,11 @@ function Slider({ movies }: ISliderProps) {
               : NEFLIX_LOGO_URL;
             return (
               <Box
-                layoutId={movie.id.toString()}
+                layoutId={
+                  animationRunning
+                    ? index.toString() + movie.id.toString()
+                    : movie.id.toString()
+                }
                 key={movie.id}
                 bgphoto={backDropPath}
                 variants={boxVariants}
@@ -246,4 +251,4 @@ function Slider({ movies }: ISliderProps) {
   );
 }
 
-export default Slider;
+export default React.memo(Slider);

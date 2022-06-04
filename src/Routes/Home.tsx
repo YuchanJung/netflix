@@ -2,7 +2,12 @@ import { motion, useViewportScroll } from "framer-motion";
 import { useEffect, useState } from "react";
 import { useQuery } from "react-query";
 import styled from "styled-components";
-import { getNowPlayingMovies, IGetMoviesResult } from "../api";
+import {
+  getNowPlayingMovies,
+  getUpcomingMovies,
+  IGetMoviesResult,
+  IMovie,
+} from "../api";
 import MovieModal from "../Components/MovieModal";
 import Slider from "../Components/Slider";
 import { makeImagePath } from "../utils";
@@ -42,23 +47,34 @@ const Overview = styled.p`
   width: 50%;
 `;
 
-const SliderContents = styled.div`
+const Contents = styled.div`
   width: 100%;
-  height: 30vh;
+  height: 120vh;
   position: relative;
   top: -100px;
   display: flex;
   flex-direction: column;
 `;
 
+const SliderTitle = styled.span`
+  font-size: 24px;
+  padding-left: 20px;
+`;
+
 function Home() {
   const { scrollY } = useViewportScroll();
   const [scrolledYPosition, setScrolledYPosition] = useState(0);
-  const { data, isLoading } = useQuery<IGetMoviesResult>(
+  const { data: nowPlaying, isLoading } = useQuery<IGetMoviesResult>(
     ["movies", "nowPlaying"],
     getNowPlayingMovies
   );
-  const totalMovies = data?.results;
+  const { data: upcoming } = useQuery<IGetMoviesResult>(
+    ["movies", "upcoming"],
+    getUpcomingMovies
+  );
+  const nowPlayingMovies = nowPlaying?.results;
+  const upcomingMovies = upcoming?.results;
+  const allMovies = nowPlayingMovies;
   useEffect(() => {
     scrollY.onChange((v) => setScrolledYPosition(v));
   }, [scrollY]);
@@ -68,15 +84,20 @@ function Home() {
         <Loader>Loading...</Loader>
       ) : (
         <>
-          <Banner bgphoto={makeImagePath(data?.results[0].backdrop_path || "")}>
-            <Title>{data?.results[0].title}</Title>
-            <Overview>{data?.results[0].overview}</Overview>
+          <Banner
+            bgphoto={makeImagePath(nowPlaying?.results[0].backdrop_path || "")}
+          >
+            <Title>{nowPlaying?.results[0].title}</Title>
+            <Overview>{nowPlaying?.results[0].overview}</Overview>
           </Banner>
-          <SliderContents>
-            {totalMovies && <Slider movies={totalMovies.slice(1)} />} 
-          </SliderContents>
-          {totalMovies && (
-            <MovieModal totalMovies={totalMovies} scrolly={scrolledYPosition} />
+          <Contents>
+            <SliderTitle>Now Playing</SliderTitle>
+            {nowPlayingMovies && <Slider movies={nowPlayingMovies.slice(1)} />}
+            <SliderTitle>Upcoming</SliderTitle>
+            {upcomingMovies && <Slider movies={upcomingMovies} />}
+          </Contents>
+          {allMovies && (
+            <MovieModal allMovies={allMovies} scrolly={scrolledYPosition} />
           )}
         </>
       )}

@@ -31,6 +31,7 @@ const Banner = styled(motion.div)<{ bgphoto: string }>`
   flex-direction: column;
   justify-content: center;
   padding: 60px;
+  padding-left: 95px;
   background-image: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 1)),
     url(${(props) => props.bgphoto});
   background-size: cover;
@@ -57,8 +58,10 @@ const Contents = styled.div`
 `;
 
 const SliderTitle = styled.span`
-  font-size: 24px;
-  padding-left: 20px;
+  font-size: 28px;
+  font-weight: bolder;
+  padding: 0 0 10px 95px;
+  margin-top: 15px;
 `;
 
 function Home() {

@@ -38,12 +38,12 @@ const boxVariants: Variants = {
     scale: 1,
   },
   hover: {
-    scale: 1.3,
+    scale: 1.4,
     y: -50,
     transition: {
       type: "tween",
-      delay: 0.5,
-      duration: 0.3,
+      delay: 0.4,
+      duration: 0.2,
     },
   },
 };
@@ -53,8 +53,8 @@ const infoVariants: Variants = {
     opacity: 1,
     transition: {
       type: "tween",
-      delay: 0.5,
-      duration: 0.3,
+      delay: 0.4,
+      duration: 0.2,
     },
   },
 };

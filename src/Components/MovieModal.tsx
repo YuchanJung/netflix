@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, Variants } from "framer-motion";
 import { useMatch, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { IMovie } from "../api";
@@ -46,6 +46,17 @@ const Overview = styled.p`
   padding: 20px;
 `;
 
+const modalVariants: Variants = {
+  hidden: {
+    scale: 0.9,
+    opacity: 0.1,
+  },
+  visible: {
+    opacity: 1,
+    scale: 1,
+  },
+};
+
 interface IMovieModal {
   allMovies: IMovie[];
   scrolly: number;
@@ -71,23 +82,23 @@ function MovieModal({ allMovies, scrolly }: IMovieModal) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           />
-          <Modal layoutId={clickedMovie.id.toString()} scrolly={scrolly}>
-            {clickedMovie && (
-              <>
-                <Cover
-                  style={{
-                    backgroundImage: `
-                      linear-gradient(to top, black, transparent), 
-                      url(${makeImagePath(
-                        clickedMovie.backdrop_path,
-                        "w500"
-                      )})`,
-                  }}
-                ></Cover>
-                <Title>{clickedMovie.title}</Title>
-                <Overview>{clickedMovie.overview}</Overview>
-              </>
-            )}
+          <Modal
+            variants={modalVariants}
+            initial="hidden"
+            animate="visible"
+            exit="hidden"
+            transition={{ type: "tween", duration: 0.15 }}
+            scrolly={scrolly}
+          >
+            <Cover
+              style={{
+                backgroundImage: `
+                  linear-gradient(to top, black, transparent), 
+                  url(${makeImagePath(clickedMovie.backdrop_path, "w500")})`,
+              }}
+            ></Cover>
+            <Title>{clickedMovie.title}</Title>
+            <Overview>{clickedMovie.overview}</Overview>
           </Modal>
         </>
       )}

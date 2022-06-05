@@ -63,7 +63,8 @@ const SliderTitle = styled.span`
 
 function Home() {
   const { scrollY } = useViewportScroll();
-  const [scrolledYPosition, setScrolledYPosition] = useState(0);
+  const [scrolledYPosition, setScrolledYPosition] = useState(scrollY.get());
+  // have to update => initial scrolledYPosition is 0 when restart page
   const { data: nowPlaying, isLoading } = useQuery<IGetMoviesResult>(
     ["movies", "nowPlaying"],
     getNowPlayingMovies
@@ -74,7 +75,10 @@ function Home() {
   );
   const nowPlayingMovies = nowPlaying?.results;
   const upcomingMovies = upcoming?.results;
-  const allMovies = nowPlayingMovies;
+  const allMovies: IMovie[] = [
+    ...(nowPlayingMovies || []),
+    ...(upcomingMovies || []),
+  ];
   useEffect(() => {
     scrollY.onChange((v) => setScrolledYPosition(v));
   }, [scrollY]);
@@ -96,9 +100,7 @@ function Home() {
             <SliderTitle>Upcoming</SliderTitle>
             {upcomingMovies && <Slider movies={upcomingMovies} />}
           </Contents>
-          {allMovies && (
-            <MovieModal allMovies={allMovies} scrolly={scrolledYPosition} />
-          )}
+          <MovieModal allMovies={allMovies} scrolly={scrolledYPosition} />
         </>
       )}
     </Wrapper>

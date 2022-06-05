@@ -1,11 +1,10 @@
 import { AnimatePresence, motion, Variants } from "framer-motion";
 import React from "react";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import { IMovie, NEFLIX_LOGO_URL } from "../api";
-import { makeImagePath } from "../utils";
+import { IMovie } from "../api";
 import AngleIcon from "./Icons/AngleIcon";
+import MovieBox from "./MovieBox";
 
 const Wrapper = styled.div`
   width: 100%;
@@ -23,35 +22,6 @@ const Row = styled(motion.div)<{ windowinnerwidth: number }>`
     Math.floor(props.windowinnerwidth / 210)}, 1fr); */
   gap: 5px;
   position: absolute;
-`;
-
-const Box = styled(motion.div)<{ bgphoto: string }>`
-  background-color: white;
-  background-image: url(${(props) => props.bgphoto});
-  background-size: cover;
-  background-position: center center;
-  width: 210px;
-  height: 140px;
-  font-size: 36px;
-  &:nth-child(2) {
-    transform-origin: center left;
-  }
-  &:nth-child(6) {
-    transform-origin: center right;
-  }
-`;
-
-const Info = styled(motion.div)`
-  padding: 10px;
-  background-color: ${(props) => props.theme.black.lighter};
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  opacity: 0;
-  h4 {
-    text-align: center;
-    font-size: 16px;
-  }
 `;
 
 const Overlay = styled.button`
@@ -93,32 +63,6 @@ const rowVariants: Variants = {
   // 170 have to be changed responsively
 };
 
-const boxVariants: Variants = {
-  normal: {
-    scale: 1,
-  },
-  hover: {
-    scale: 1.3,
-    y: -50,
-    transition: {
-      type: "tween",
-      delay: 0.5,
-      duration: 0.3,
-    },
-  },
-};
-
-const infoVariants: Variants = {
-  hover: {
-    opacity: 1,
-    transition: {
-      type: "tween",
-      delay: 0.5,
-      duration: 0.3,
-    },
-  },
-};
-
 interface ISliderProps {
   movies: IMovie[];
 }
@@ -154,7 +98,6 @@ function Slider({ movies }: ISliderProps) {
   const offset = Math.floor(window.innerWidth / 210); 
   have to update offset responsively 
    */
-  const navigate = useNavigate();
   const [index, setIndex] = useState(0);
   const [animationRunning, setAnimationRunning] = useState(false);
   const [animationLength, setAnimationLength] = useState(200);
@@ -167,10 +110,7 @@ function Slider({ movies }: ISliderProps) {
     animationLength,
   };
   const currentMovies = returnCurrentMovies(movies, index, offset);
-  const onBoxClicked = (movieId: number) => {
-    navigate(`/movie/${movieId}`);
-  };
-  const toggleAnimationRunning = () => setAnimationRunning((prev) => !prev);
+  const toggleAnimationRunning = () => setAnimationRunning((prev) => prev);
   const changeIndex = (direction: "left" | "right") => {
     if (movies) {
       if (animationRunning) return; // to prevent a bug that occurs when button is clicked too fast
@@ -214,31 +154,9 @@ function Slider({ movies }: ISliderProps) {
           transition={{ type: "tween", duration: 0.6 }}
           key={index} // do i need keyword of slider ?
         >
-          {currentMovies.map((movie) => {
-            const backDropPath = movie.backdrop_path
-              ? makeImagePath(movie.backdrop_path, "w500")
-              : NEFLIX_LOGO_URL;
-            return (
-              <Box
-                layoutId={
-                  animationRunning
-                    ? index.toString() + movie.id.toString()
-                    : movie.id.toString()
-                }
-                key={movie.id}
-                bgphoto={backDropPath}
-                variants={boxVariants}
-                initial="normal"
-                whileHover="hover"
-                transition={{ type: "tween" }}
-                onClick={() => onBoxClicked(movie.id)}
-              >
-                <Info variants={infoVariants}>
-                  <h4>{movie.title}</h4>
-                </Info>
-              </Box>
-            );
-          })}
+          {currentMovies.map((movie) => (
+            <MovieBox movie={movie} key={movie.id} />
+          ))}
         </Row>
       </AnimatePresence>
       <Overlay onClick={() => changeIndex("left")}>

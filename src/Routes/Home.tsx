@@ -15,7 +15,7 @@ import { makeImagePath } from "../utils";
 const Wrapper = styled.div`
   width: 100%;
   height: 200vh;
-  background-color: black;
+  background-color: #141414;
 `;
 
 const Loader = styled.div`
@@ -32,7 +32,7 @@ const Banner = styled(motion.div)<{ bgphoto: string }>`
   justify-content: center;
   padding: 60px;
   padding-left: 95px;
-  background-image: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 1)),
+  background-image: linear-gradient(rgba(0, 0, 0, 0), rgba(20, 20, 20, 1)),
     url(${(props) => props.bgphoto});
   background-size: cover;
 `;
@@ -60,8 +60,8 @@ const Contents = styled.div`
 const SliderTitle = styled.span`
   font-size: 28px;
   font-weight: bolder;
-  padding: 0 0 10px 95px;
-  margin-top: 15px;
+  padding-left: 95px;
+  margin: 12px 0px;
 `;
 
 function Home() {

@@ -5,14 +5,16 @@ import styled from "styled-components";
 import { IMovie } from "../api";
 import AngleIcon from "./Icons/AngleIcon";
 import MovieBox from "./MovieBox";
+import ProgressBar from "./ProgressBar";
 
 const Wrapper = styled.div`
   width: 100%;
-  height: 25vh;
+  height: 140px;
   display: flex;
   justify-content: center;
   align-items: center;
   position: relative;
+  margin-bottom: 20px;
 `;
 
 const Row = styled(motion.div)<{ windowinnerwidth: number }>`
@@ -140,15 +142,16 @@ function Slider({ movies }: ISlider) {
     }
   };
   return (
-    <Wrapper>
+    <Wrapper
+      onMouseEnter={toggleIsRowHovered}
+      onMouseLeave={toggleIsRowHovered}
+    >
       <AnimatePresence
         custom={rowVariantsProps}
         initial={false}
         onExitComplete={toggleAnimationRunning}
       >
         <Row
-          onMouseEnter={toggleIsRowHovered}
-          onMouseLeave={toggleIsRowHovered}
           windowinnerwidth={window.innerWidth}
           custom={rowVariantsProps}
           variants={rowVariants}
@@ -163,6 +166,7 @@ function Slider({ movies }: ISlider) {
           ))}
         </Row>
       </AnimatePresence>
+      {isRowHovered && <ProgressBar index={index} maxIndex={maxIndex} />}
       <Overlay onClick={() => changeIndex("left")}>
         {isRowHovered && <AngleIcon direction="left" className="prevSlide" />}
       </Overlay>

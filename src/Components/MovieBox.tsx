@@ -5,6 +5,7 @@ import { IMovie, NEFLIX_LOGO_URL } from "../api";
 import { makeImagePath } from "../utils";
 
 const Box = styled(motion.div)<{ bgphoto: string }>`
+  cursor: pointer;
   background-color: white;
   background-image: url(${(props) => props.bgphoto});
   background-size: cover;

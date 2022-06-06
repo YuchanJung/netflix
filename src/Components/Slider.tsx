@@ -45,7 +45,7 @@ const Overlay = styled.button`
 `;
 
 const rowVariants: Variants = {
-  hidden: (props: IRowVariantsProps) => ({
+  hidden: (props: IRowVariants) => ({
     x:
       props.direction === "left"
         ? -window.outerWidth + props.animationLength
@@ -54,7 +54,7 @@ const rowVariants: Variants = {
   visible: {
     x: 0,
   },
-  exit: (props: IRowVariantsProps) => ({
+  exit: (props: IRowVariants) => ({
     x:
       props.direction === "left"
         ? window.outerWidth - props.animationLength
@@ -63,11 +63,11 @@ const rowVariants: Variants = {
   // 170 have to be changed responsively
 };
 
-interface ISliderProps {
+interface ISlider {
   movies: IMovie[];
 }
 
-interface IRowVariantsProps {
+interface IRowVariants {
   direction: "left" | "right";
   animationLength: number;
 }
@@ -92,7 +92,7 @@ function returnCurrentMovies(movies: IMovie[], index: number, offset: number) {
   return currentMovies;
 }
 
-function Slider({ movies }: ISliderProps) {
+function Slider({ movies }: ISlider) {
   const offset = 5;
   /* 
   const offset = Math.floor(window.innerWidth / 210); 
@@ -102,15 +102,17 @@ function Slider({ movies }: ISliderProps) {
   const [animationRunning, setAnimationRunning] = useState(false);
   const [animationLength, setAnimationLength] = useState(200);
   const [direction, setDirection] = useState<"left" | "right">("right");
+  const [isRowHovered, setIsRowHovered] = useState(false);
   const totalLength = movies.length;
   const maxIndex = Math.ceil(totalLength / offset) - 1;
   const remainder = (maxIndex + 1) * offset - totalLength;
-  const rowVariantsProps: IRowVariantsProps = {
+  const rowVariantsProps: IRowVariants = {
     direction,
     animationLength,
   };
   const currentMovies = returnCurrentMovies(movies, index, offset);
   const toggleAnimationRunning = () => setAnimationRunning((prev) => prev);
+  const toggleIsRowHovered = () => setIsRowHovered((prev) => !prev);
   const changeIndex = (direction: "left" | "right") => {
     if (movies) {
       if (animationRunning) return; // to prevent a bug that occurs when button is clicked too fast
@@ -145,6 +147,8 @@ function Slider({ movies }: ISliderProps) {
         onExitComplete={toggleAnimationRunning}
       >
         <Row
+          onMouseEnter={toggleIsRowHovered}
+          onMouseLeave={toggleIsRowHovered}
           windowinnerwidth={window.innerWidth}
           custom={rowVariantsProps}
           variants={rowVariants}
@@ -160,10 +164,10 @@ function Slider({ movies }: ISliderProps) {
         </Row>
       </AnimatePresence>
       <Overlay onClick={() => changeIndex("left")}>
-        <AngleIcon direction="left" className="prevSlide" />
+        {isRowHovered && <AngleIcon direction="left" className="prevSlide" />}
       </Overlay>
       <Overlay onClick={() => changeIndex("right")}>
-        <AngleIcon direction="right" className="nextSlide" />
+        {isRowHovered && <AngleIcon direction="right" className="nextSlide" />}
       </Overlay>
     </Wrapper>
   );

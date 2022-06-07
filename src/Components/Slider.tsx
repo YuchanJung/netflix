@@ -113,7 +113,7 @@ function Slider({ movies }: ISlider) {
     animationLength,
   };
   const currentMovies = returnCurrentMovies(movies, index, offset);
-  const toggleAnimationRunning = () => setAnimationRunning((prev) => prev);
+  const toggleAnimationRunning = () => setAnimationRunning((prev) => !prev);
   const toggleIsRowHovered = () => setIsRowHovered((prev) => !prev);
   const changeIndex = (direction: "left" | "right") => {
     if (movies) {

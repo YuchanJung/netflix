@@ -1,4 +1,4 @@
-import { motion, useViewportScroll } from "framer-motion";
+import { motion, useViewportScroll, Variants } from "framer-motion";
 import { useEffect, useState } from "react";
 import { useQuery } from "react-query";
 import styled from "styled-components";
@@ -12,7 +12,7 @@ import MovieModal from "../Components/MovieModal";
 import Slider from "../Components/Slider";
 import { makeImagePath } from "../utils";
 
-const Wrapper = styled.div`
+const Wrapper = styled(motion.div)`
   width: 100%;
   height: 200vh;
   background-color: #141414;
@@ -64,6 +64,12 @@ const SliderTitle = styled.span`
   margin: 12px 0px;
 `;
 
+const wrapperVariants: Variants = {
+  initial: { opacity: 0 },
+  animate: { opacity: 1 },
+  exit: { opacity: 0 },
+};
+
 function Home() {
   const { scrollY } = useViewportScroll();
   const [scrolledYPosition, setScrolledYPosition] = useState(scrollY.get());
@@ -86,7 +92,13 @@ function Home() {
     scrollY.onChange((v) => setScrolledYPosition(v));
   }, [scrollY]);
   return (
-    <Wrapper>
+    <Wrapper
+      variants={wrapperVariants}
+      initial="initial"
+      animate="animate"
+      exit="exit"
+      transition={{ type: "tween", duration: 0.5 }}
+    >
       {isLoading ? (
         <Loader>Loading...</Loader>
       ) : (

@@ -1,6 +1,10 @@
+import { motion } from "framer-motion";
+
 function Tv() {
   return (
-    <div style={{ backgroundColor: "whitesmoke", height: "200vh" }}>tv</div>
+    <motion.div style={{ backgroundColor: "whitesmoke", height: "200vh" }}>
+      tv
+    </motion.div>
   );
 }
 

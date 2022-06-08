@@ -1,7 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { QueryClient, QueryClientProvider } from "react-query";
-import { BrowserRouter } from "react-router-dom";
 import { RecoilRoot } from "recoil";
 import { ThemeProvider } from "styled-components";
 import App from "./App";
@@ -19,10 +18,8 @@ root.render(
     <RecoilRoot>
       <QueryClientProvider client={client}>
         <ThemeProvider theme={theme}>
-          <BrowserRouter>
-            <GlobalStyle />
-            <App />
-          </BrowserRouter>
+          <GlobalStyle />
+          <App />
         </ThemeProvider>
       </QueryClientProvider>
     </RecoilRoot>

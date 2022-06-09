@@ -71,9 +71,6 @@ const wrapperVariants: Variants = {
 };
 
 function Home() {
-  const { scrollY } = useViewportScroll();
-  const [scrolledYPosition, setScrolledYPosition] = useState(scrollY.get());
-  // have to update => initial scrolledYPosition is 0 when restart page
   const { data: nowPlaying, isLoading } = useQuery<IGetMoviesResult>(
     ["movies", "nowPlaying"],
     getNowPlayingMovies
@@ -88,9 +85,6 @@ function Home() {
     ...(nowPlayingMovies || []),
     ...(upcomingMovies || []),
   ];
-  useEffect(() => {
-    scrollY.onChange((v) => setScrolledYPosition(v));
-  }, [scrollY]);
   return (
     <Wrapper
       variants={wrapperVariants}
@@ -115,7 +109,7 @@ function Home() {
             <SliderTitle>Upcoming</SliderTitle>
             {upcomingMovies && <Slider movies={upcomingMovies} />}
           </Contents>
-          <MovieModal allMovies={allMovies} scrolly={scrolledYPosition} />
+          <MovieModal allMovies={allMovies} />
         </>
       )}
     </Wrapper>

@@ -1,4 +1,9 @@
-import { motion, useAnimation, useViewportScroll, Variants } from "framer-motion";
+import {
+  motion,
+  useAnimation,
+  useViewportScroll,
+  Variants,
+} from "framer-motion";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useMatch, useNavigate } from "react-router-dom";
@@ -28,10 +33,7 @@ const Logo = styled(motion.svg)`
   width: 95px;
   height: 25px;
   fill: ${(props) => props.theme.red};
-  path {
-    stroke-width: 6px;
-    stroke: white;
-  }
+  transform: scale(1.1);
 `;
 
 const Items = styled.ul`
@@ -89,8 +91,7 @@ const Input = styled(motion.input)`
   z-index: -1;
 `;
 
-const MagnifierSvg = styled(motion.svg)`
-`;
+const MagnifierSvg = styled(motion.svg)``;
 
 const logoVariants: Variants = {
   initial: {
@@ -114,12 +115,14 @@ interface IForm {
 }
 
 function Header() {
-  const [searchOpen, setSearchOpen] = useState(false);
   const homeMatch = useMatch("/");
   const tvMatch = useMatch("tv");
   const inputAnimation = useAnimation();
   const navAnimation = useAnimation();
   const { scrollY } = useViewportScroll();
+  const { register, handleSubmit } = useForm<IForm>();
+  const [searchOpen, setSearchOpen] = useState(false);
+  const navigate = useNavigate();
   const toggleSearch = () => {
     if (searchOpen) {
       inputAnimation.start({ scaleX: 0 });
@@ -137,8 +140,6 @@ function Header() {
       }
     });
   }, [scrollY, navAnimation]);
-  const { register, handleSubmit } = useForm<IForm>();
-  const navigate = useNavigate();
   const onValid = (data: IForm) => {
     navigate(`search?keyword=${data.keyword}`);
   };

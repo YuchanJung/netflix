@@ -146,6 +146,7 @@ function Slider({ movies }: ISlider) {
       onMouseEnter={toggleIsRowHovered}
       onMouseLeave={toggleIsRowHovered}
     >
+      {isRowHovered && <ProgressBar index={index} maxIndex={maxIndex} />}
       <AnimatePresence
         custom={rowVariantsProps}
         initial={false}
@@ -166,7 +167,6 @@ function Slider({ movies }: ISlider) {
           ))}
         </Row>
       </AnimatePresence>
-      {isRowHovered && <ProgressBar index={index} maxIndex={maxIndex} />}
       <Overlay onClick={() => changeIndex("left")}>
         {isRowHovered && <AngleIcon direction="left" className="prevSlide" />}
       </Overlay>

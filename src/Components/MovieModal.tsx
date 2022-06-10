@@ -1,15 +1,19 @@
 import { AnimatePresence, motion, Variants } from "framer-motion";
 import { useMatch, useNavigate } from "react-router-dom";
+import { useRecoilValue } from "recoil";
 import styled from "styled-components";
-import { IMovie } from "../api";
+import { allMoviesState } from "../atom";
 import { makeImagePath } from "../utils";
 
 const Overlay = styled(motion.div)`
   position: fixed;
   top: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.1);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -59,11 +63,8 @@ const modalVariants: Variants = {
   },
 };
 
-interface IMovieModal {
-  allMovies: IMovie[];
-}
-
-function MovieModal({ allMovies }: IMovieModal) {
+function MovieModal() {
+  const allMovies = useRecoilValue(allMoviesState);
   const moviePathMatch = useMatch("/movie/:movieId");
   const navigate = useNavigate();
   const onOverlayClicked = () => {

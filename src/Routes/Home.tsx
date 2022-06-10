@@ -1,14 +1,14 @@
-import { motion, useViewportScroll, Variants } from "framer-motion";
-import { useEffect, useState } from "react";
+import { motion, Variants } from "framer-motion";
+import { useEffect } from "react";
 import { useQuery } from "react-query";
+import { useSetRecoilState } from "recoil";
 import styled from "styled-components";
 import {
   getNowPlayingMovies,
   getUpcomingMovies,
   IGetMoviesResult,
-  IMovie,
 } from "../api";
-import MovieModal from "../Components/MovieModal";
+import { allMoviesState } from "../atom";
 import Slider from "../Components/Slider";
 import { makeImagePath } from "../utils";
 
@@ -71,6 +71,7 @@ const wrapperVariants: Variants = {
 };
 
 function Home() {
+  const setAllMovies = useSetRecoilState(allMoviesState);
   const { data: nowPlaying, isLoading } = useQuery<IGetMoviesResult>(
     ["movies", "nowPlaying"],
     getNowPlayingMovies
@@ -81,10 +82,13 @@ function Home() {
   );
   const nowPlayingMovies = nowPlaying?.results;
   const upcomingMovies = upcoming?.results;
-  const allMovies: IMovie[] = [
-    ...(nowPlayingMovies || []),
-    ...(upcomingMovies || []),
-  ];
+  useEffect(() => {
+    setAllMovies((prev) => [
+      ...prev,
+      ...(nowPlayingMovies || []),
+      ...(upcomingMovies || []),
+    ]);
+  }, [nowPlayingMovies, upcomingMovies]);
   return (
     <Wrapper
       variants={wrapperVariants}
@@ -109,7 +113,6 @@ function Home() {
             <SliderTitle>Upcoming</SliderTitle>
             {upcomingMovies && <Slider movies={upcomingMovies} />}
           </Contents>
-          <MovieModal allMovies={allMovies} />
         </>
       )}
     </Wrapper>

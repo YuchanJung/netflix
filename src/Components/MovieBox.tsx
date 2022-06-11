@@ -1,19 +1,17 @@
-import { motion, Variants } from "framer-motion";
+import { motion, useAnimation, Variants } from "framer-motion";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useRecoilValue } from "recoil";
 import styled from "styled-components";
 import { IMovie, NEFLIX_LOGO_URL } from "../api";
-import { allMoviesState } from "../atom";
 import { makeImagePath } from "../utils";
-import MovieModal from "./MovieModal";
 
 const Wrapper = styled(motion.div)`
   cursor: pointer;
-  // background-color: white;
   width: 210px;
   height: 140px;
-  border-radius: 5px;
   font-size: 36px;
+  display: flex;
+  flex-direction: column;
   &:nth-child(2) {
     transform-origin: center left;
   }
@@ -22,38 +20,35 @@ const Wrapper = styled(motion.div)`
   }
 `;
 
-const Box = styled(motion.div)<{ bgphoto: string }>`
-  cursor: pointer;
+const ContentScreen = styled(motion.div)<{ bgphoto: string }>`
   background-image: url(${(props) => props.bgphoto});
   background-size: cover;
   background-position: center center;
-  width: 100%;
-  height: 100%;
-  &:nth-child(2) {
-    transform-origin: center left;
-  }
-  &:nth-child(6) {
-    transform-origin: center right;
-  }
+  width: 210px;
+  height: 140px;
+  border-radius: 5px;
 `;
 
-const Info = styled(motion.div)`
+const HoveredScreen = styled(ContentScreen)`
+`;
+
+const HoveredContentInfo = styled(motion.div)`
   padding: 10px;
   background-color: ${(props) => props.theme.black.lighter};
-  position: absolute;
-  width: 100%;
-  height: 80px;
-  bottom: -80px;
+  width: 210px;
+  min-height: 120px;
   opacity: 0;
+  z-index: 1;
   h4 {
     text-align: center;
     font-size: 16px;
   }
 `;
 
-const wrapperVariants: Variants = {
+const boxVariants: Variants = {
   normal: {
     scale: 1,
+    y: 0,
   },
   hover: {
     scale: 1.4,
@@ -61,7 +56,6 @@ const wrapperVariants: Variants = {
     borderBottomLeftRadius: 0,
     borderBottomRightRadius: 0,
     transition: {
-      type: "tween",
       delay: 0.4,
       duration: 0.2,
     },
@@ -69,12 +63,16 @@ const wrapperVariants: Variants = {
 };
 
 const infoVariants: Variants = {
+  normal: {
+    opacity: 0,
+    scale: 1,
+  },
   hover: {
     opacity: 1,
+    scale: 1.4,
     borderBottomLeftRadius: 5,
     borderBottomRightRadius: 5,
     transition: {
-      type: "tween",
       delay: 0.4,
       duration: 0.2,
     },
@@ -86,7 +84,9 @@ interface IMovieBox {
 }
 
 function MovieBox({ movie }: IMovieBox) {
-  const allMovies = useRecoilValue(allMoviesState);
+  const [isHovered, setIsHovered] = useState(false);
+  const movieAnimation = useAnimation();
+  const infoAnimation = useAnimation();
   const navigate = useNavigate();
   const backDropPath = movie.backdrop_path
     ? makeImagePath(movie.backdrop_path, "w500")
@@ -94,22 +94,41 @@ function MovieBox({ movie }: IMovieBox) {
   const onBoxClicked = (movieId: number) => {
     navigate(`/movie/${movieId}`);
   };
+  const toggleIsHovered = () =>
+    setIsHovered((prev) => {
+      if (prev) {
+        movieAnimation.start("normal");
+        infoAnimation.start("normal");
+      } else {
+        movieAnimation.start("hover");
+        infoAnimation.start("hover");
+      }
+      return !prev;
+    });
   return (
-    <>
-      <Wrapper
-        variants={wrapperVariants}
+    // Box in Box?
+    <Wrapper
+      onMouseEnter={toggleIsHovered}
+      onMouseLeave={toggleIsHovered}
+      onClick={() => onBoxClicked(movie.id)}
+    >
+      <ContentScreen bgphoto={backDropPath}>
+        <HoveredScreen
+          variants={boxVariants}
+          animate={movieAnimation}
+          transition={{ type: "tween" }}
+          bgphoto={backDropPath}
+        />
+      </ContentScreen>
+      <HoveredContentInfo
+        variants={infoVariants}
         initial="normal"
-        whileHover="hover"
+        animate={infoAnimation}
         transition={{ type: "tween" }}
-        onClick={() => onBoxClicked(movie.id)}
       >
-        <Box bgphoto={backDropPath} />
-        <Info variants={infoVariants}>
-          <h4>{movie.title}</h4>
-        </Info>
-      </Wrapper>
-      <MovieModal />
-    </>
+        <h4>{movie.title}</h4>
+      </HoveredContentInfo>
+    </Wrapper>
   );
 }
 

@@ -9,6 +9,7 @@ import {
   IGetMoviesResult,
 } from "../api";
 import { allMoviesState } from "../atom";
+import MovieModal from "../Components/MovieModal";
 import Slider from "../Components/Slider";
 import { makeImagePath } from "../utils";
 
@@ -51,8 +52,8 @@ const Overview = styled.p`
 const Contents = styled.div`
   width: 100%;
   height: 120vh;
-  position: relative;
-  top: -100px;
+  // position: relative;
+  // top: -100px;
   display: flex;
   flex-direction: column;
 `;
@@ -113,6 +114,7 @@ function Home() {
             <SliderTitle>Upcoming</SliderTitle>
             {upcomingMovies && <Slider movies={upcomingMovies} />}
           </Contents>
+          <MovieModal />
         </>
       )}
     </Wrapper>

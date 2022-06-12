@@ -19,6 +19,7 @@ const Wrapper = styled.div`
 `;
 
 const Title = styled.h2`
+//  update style when only title hovered 
   font-size: 24px;
   font-weight: bolder;
   width: 100%;
@@ -159,13 +160,13 @@ function Slider({ movies, title }: ISlider) {
     }
   };
   return (
-    <Wrapper>
+    <Wrapper
+      onMouseEnter={toggleIsRowHovered}
+      onMouseLeave={toggleIsRowHovered}
+    >
       <Title>{title}</Title>
       {isRowHovered && <PageIndicators index={index} maxIndex={maxIndex} />}
-      <RowContainer
-        onMouseEnter={toggleIsRowHovered}
-        onMouseLeave={toggleIsRowHovered}
-      >
+      <RowContainer>
         <AnimatePresence
           custom={rowVariantsProps}
           initial={false}

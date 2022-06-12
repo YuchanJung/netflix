@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { IMovie, NEFLIX_LOGO_URL } from "../api";
 import { makeImagePath } from "../utils";
+import MovieModal from "./MovieModal";
 
 const Wrapper = styled(motion.div)`
   cursor: pointer;
@@ -30,31 +31,35 @@ const ContentScreen = styled(motion.div)<{ bgphoto: string }>`
   border-radius: 5px;
 `;
 
-const HoveredScreen = styled(ContentScreen)``;
+const PreviewModal = styled(motion.div)`
+  position: absolute;
+  z-index: 1;
+`;
+
+const HoveredScreen = styled(ContentScreen)`
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+`;
 
 const HoveredContentInfo = styled(motion.div)`
-  padding: 10px;
   background-color: ${(props) => props.theme.black.lighter};
   width: 210px;
   min-height: 120px;
-  opacity: 0;
-  z-index: 1;
+  padding: 10px;
   h4 {
     text-align: center;
     font-size: 16px;
   }
 `;
 
-const boxVariants: Variants = {
+const modalVariants: Variants = {
   normal: {
     scale: 1,
     y: 0,
   },
   hover: {
-    scale: 1.4,
     y: -50,
-    borderBottomLeftRadius: 0,
-    borderBottomRightRadius: 0,
+    scale: 1.4,
     transition: {
       delay: 0.4,
       duration: 0.3,
@@ -65,11 +70,9 @@ const boxVariants: Variants = {
 const infoVariants: Variants = {
   normal: {
     opacity: 0,
-    scale: 1,
   },
   hover: {
     opacity: 1,
-    scale: 1.4,
     borderBottomLeftRadius: 5,
     borderBottomRightRadius: 5,
     transition: {
@@ -94,39 +97,38 @@ function MovieBox({ movie }: IMovieBox) {
   };
   const toggleIsHovered = () => setIsHovered((prev) => !prev);
   return (
-    <Wrapper
-      onMouseEnter={toggleIsHovered}
-      onMouseLeave={toggleIsHovered}
-      onClick={() => onBoxClicked(movie.id)}
-    >
-      <ContentScreen bgphoto={backDropPath}>
-        <AnimatePresence>
-          {isHovered && (
-            <HoveredScreen
-              variants={boxVariants}
-              initial="normal"
-              animate="hover"
-              exit="normal"
-              transition={{ type: "tween" }}
-              bgphoto={backDropPath}
-            />
-          )}
-        </AnimatePresence>
-      </ContentScreen>
-      <AnimatePresence>
-        {isHovered && (
-          <HoveredContentInfo
-            variants={infoVariants}
-            initial="normal"
-            animate="hover"
-            exit="normal"
-            transition={{ type: "tween" }}
-          >
-            <h4>{movie.title}</h4>
-          </HoveredContentInfo>
-        )}
-      </AnimatePresence>
-    </Wrapper>
+    <>
+      <Wrapper
+        onMouseEnter={toggleIsHovered}
+        onMouseLeave={toggleIsHovered}
+        onClick={() => onBoxClicked(movie.id)}
+      >
+        <ContentScreen bgphoto={backDropPath}>
+          <AnimatePresence>
+            {isHovered && (
+              <PreviewModal
+                variants={modalVariants}
+                initial="normal"
+                animate="hover"
+                exit="normal"
+                transition={{ type: "tween" }}
+              >
+                <HoveredScreen bgphoto={backDropPath} />
+                <HoveredContentInfo
+                  variants={infoVariants}
+                  initial="normal"
+                  animate="hover"
+                  exit="normal"
+                >
+                  <h4>{movie.title}</h4>
+                </HoveredContentInfo>
+              </PreviewModal>
+            )}
+          </AnimatePresence>
+        </ContentScreen>
+      </Wrapper>
+      <MovieModal layoutIdForModal={movie.id.toString()} />
+    </>
   );
 }
 

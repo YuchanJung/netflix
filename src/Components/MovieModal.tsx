@@ -63,7 +63,11 @@ const modalVariants: Variants = {
   },
 };
 
-function MovieModal() {
+interface IModal {
+  layoutIdForModal: string;
+}
+
+function MovieModal({ layoutIdForModal }: IModal) {
   const allMovies = useRecoilValue(allMoviesState);
   const moviePathMatch = useMatch("/movie/:movieId");
   const navigate = useNavigate();
@@ -88,6 +92,7 @@ function MovieModal() {
         >
           <Modal
             variants={modalVariants}
+            layoutId={layoutIdForModal}
             initial="hidden"
             animate="visible"
             exit="hidden"

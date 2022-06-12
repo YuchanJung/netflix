@@ -109,7 +109,6 @@ function Home() {
               <Slider movies={upcomingMovies} title="Upcoming" />
             )}
           </Contents>
-          <MovieModal />
         </>
       )}
     </Wrapper>

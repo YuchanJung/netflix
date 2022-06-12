@@ -1,12 +1,12 @@
 import styled from "styled-components";
 
-const Bar = styled.div<IProgressBar>`
+const Container = styled.div<IPageIndicators>`
   display: grid;
   grid-template-columns: repeat(${(props) => props.maxIndex}, 1fr);
   gap: 1px;
   position: absolute;
+  top: 20px;
   right: 95px;
-  top: -20px;
 `;
 
 const Block = styled.div`
@@ -14,23 +14,23 @@ const Block = styled.div`
   height: 3px;
 `;
 
-interface IProgressBar {
+interface IPageIndicators {
   index: number;
   maxIndex: number;
 }
 
-function ProgressBar({ index, maxIndex }: IProgressBar) {
+function PageIndicators({ index, maxIndex }: IPageIndicators) {
   const blockArr = Array.from(Array(maxIndex + 1).keys());
   return (
-    <Bar index={index} maxIndex={maxIndex + 1}>
+    <Container index={index} maxIndex={maxIndex + 1}>
       {blockArr.map((i) => (
         <Block
           key={i}
           style={{ backgroundColor: i === index ? "#aaaaaa" : "#4d4d4d" }}
         />
       ))}
-    </Bar>
+    </Container>
   );
 }
 
-export default ProgressBar;
+export default PageIndicators;

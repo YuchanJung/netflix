@@ -1,4 +1,4 @@
-import { motion, useAnimation, Variants } from "framer-motion";
+import { AnimatePresence, motion, Variants } from "framer-motion";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
@@ -9,6 +9,7 @@ const Wrapper = styled(motion.div)`
   cursor: pointer;
   width: 210px;
   height: 140px;
+  max-height: 140px;
   font-size: 36px;
   display: flex;
   flex-direction: column;
@@ -25,12 +26,11 @@ const ContentScreen = styled(motion.div)<{ bgphoto: string }>`
   background-size: cover;
   background-position: center center;
   width: 210px;
-  height: 140px;
+  min-height: 140px;
   border-radius: 5px;
 `;
 
-const HoveredScreen = styled(ContentScreen)`
-`;
+const HoveredScreen = styled(ContentScreen)``;
 
 const HoveredContentInfo = styled(motion.div)`
   padding: 10px;
@@ -57,7 +57,7 @@ const boxVariants: Variants = {
     borderBottomRightRadius: 0,
     transition: {
       delay: 0.4,
-      duration: 0.2,
+      duration: 0.3,
     },
   },
 };
@@ -74,7 +74,7 @@ const infoVariants: Variants = {
     borderBottomRightRadius: 5,
     transition: {
       delay: 0.4,
-      duration: 0.2,
+      duration: 0.3,
     },
   },
 };
@@ -85,8 +85,6 @@ interface IMovieBox {
 
 function MovieBox({ movie }: IMovieBox) {
   const [isHovered, setIsHovered] = useState(false);
-  const movieAnimation = useAnimation();
-  const infoAnimation = useAnimation();
   const navigate = useNavigate();
   const backDropPath = movie.backdrop_path
     ? makeImagePath(movie.backdrop_path, "w500")
@@ -94,40 +92,40 @@ function MovieBox({ movie }: IMovieBox) {
   const onBoxClicked = (movieId: number) => {
     navigate(`/movie/${movieId}`);
   };
-  const toggleIsHovered = () =>
-    setIsHovered((prev) => {
-      if (prev) {
-        movieAnimation.start("normal");
-        infoAnimation.start("normal");
-      } else {
-        movieAnimation.start("hover");
-        infoAnimation.start("hover");
-      }
-      return !prev;
-    });
+  const toggleIsHovered = () => setIsHovered((prev) => !prev);
   return (
-    // Box in Box?
     <Wrapper
       onMouseEnter={toggleIsHovered}
       onMouseLeave={toggleIsHovered}
       onClick={() => onBoxClicked(movie.id)}
     >
       <ContentScreen bgphoto={backDropPath}>
-        <HoveredScreen
-          variants={boxVariants}
-          animate={movieAnimation}
-          transition={{ type: "tween" }}
-          bgphoto={backDropPath}
-        />
+        <AnimatePresence>
+          {isHovered && (
+            <HoveredScreen
+              variants={boxVariants}
+              initial="normal"
+              animate="hover"
+              exit="normal"
+              transition={{ type: "tween" }}
+              bgphoto={backDropPath}
+            />
+          )}
+        </AnimatePresence>
       </ContentScreen>
-      <HoveredContentInfo
-        variants={infoVariants}
-        initial="normal"
-        animate={infoAnimation}
-        transition={{ type: "tween" }}
-      >
-        <h4>{movie.title}</h4>
-      </HoveredContentInfo>
+      <AnimatePresence>
+        {isHovered && (
+          <HoveredContentInfo
+            variants={infoVariants}
+            initial="normal"
+            animate="hover"
+            exit="normal"
+            transition={{ type: "tween" }}
+          >
+            <h4>{movie.title}</h4>
+          </HoveredContentInfo>
+        )}
+      </AnimatePresence>
     </Wrapper>
   );
 }

@@ -5,16 +5,32 @@ import styled from "styled-components";
 import { IMovie } from "../api";
 import AngleIcon from "./Icons/AngleIcon";
 import MovieBox from "./MovieBox";
-import ProgressBar from "./ProgressBar";
+import PageIndicators from "./PageIndicators";
 
 const Wrapper = styled.div`
   width: 100%;
-  height: 140px;
+  height: 180px;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   position: relative;
-  margin-bottom: 20px;
+  margin: 25px 0;
+`;
+
+const Title = styled.h2`
+  font-size: 24px;
+  font-weight: bolder;
+  width: 100%;
+  height: 40px;
+  padding: 0 95px;
+`;
+
+const RowContainer = styled.div`
+  width: 100%;
+  height: 140px; // maybe change responsively
+  display: flex;
+  justify-content: center;
 `;
 
 const Row = styled(motion.div)<{ windowinnerwidth: number }>`
@@ -27,15 +43,16 @@ const Row = styled(motion.div)<{ windowinnerwidth: number }>`
 `;
 
 const Overlay = styled.button`
+  cursor: pointer;
   display: flex;
   justify-content: center;
   align-items: center;
   position: absolute;
+  top: 40px;
   width: 95px;
   height: 140px;
   background-color: rgba(0, 0, 0, 0.5);
   color: white;
-  cursor: pointer;
   &:nth-last-child(2) {
     padding-right: 20px;
     left: 0;
@@ -67,6 +84,7 @@ const rowVariants: Variants = {
 
 interface ISlider {
   movies: IMovie[];
+  title: string;
 }
 
 interface IRowVariants {
@@ -76,7 +94,6 @@ interface IRowVariants {
 // const offset = 6;
 
 function returnCurrentMovies(movies: IMovie[], index: number, offset: number) {
-  // movies = movies.slice(1); // remove the first movie which was used for banner
   const totalLength = movies.length;
   const maxIndex = Math.ceil(totalLength / offset) - 1;
   const remainder = (maxIndex + 1) * offset - totalLength;
@@ -94,7 +111,7 @@ function returnCurrentMovies(movies: IMovie[], index: number, offset: number) {
   return currentMovies;
 }
 
-function Slider({ movies }: ISlider) {
+function Slider({ movies, title }: ISlider) {
   const offset = 5;
   /* 
   const offset = Math.floor(window.innerWidth / 210); 
@@ -142,31 +159,34 @@ function Slider({ movies }: ISlider) {
     }
   };
   return (
-    <Wrapper
-      onMouseEnter={toggleIsRowHovered}
-      onMouseLeave={toggleIsRowHovered}
-    >
-      {isRowHovered && <ProgressBar index={index} maxIndex={maxIndex} />}
-      <AnimatePresence
-        custom={rowVariantsProps}
-        initial={false}
-        onExitComplete={toggleAnimationRunning}
+    <Wrapper>
+      <Title>{title}</Title>
+      {isRowHovered && <PageIndicators index={index} maxIndex={maxIndex} />}
+      <RowContainer
+        onMouseEnter={toggleIsRowHovered}
+        onMouseLeave={toggleIsRowHovered}
       >
-        <Row
-          windowinnerwidth={window.innerWidth}
+        <AnimatePresence
           custom={rowVariantsProps}
-          variants={rowVariants}
-          initial="hidden"
-          animate="visible"
-          exit="exit"
-          transition={{ type: "tween", duration: 0.6 }}
-          key={index} // do i need keyword of slider ?
+          initial={false}
+          onExitComplete={toggleAnimationRunning}
         >
-          {currentMovies.map((movie) => (
-            <MovieBox movie={movie} key={movie.id} />
-          ))}
-        </Row>
-      </AnimatePresence>
+          <Row
+            windowinnerwidth={window.innerWidth}
+            custom={rowVariantsProps}
+            variants={rowVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            transition={{ type: "tween", duration: 0.6 }}
+            key={index} // do i need keyword of slider ?
+          >
+            {currentMovies.map((movie) => (
+              <MovieBox movie={movie} key={movie.id} />
+            ))}
+          </Row>
+        </AnimatePresence>
+      </RowContainer>
       <Overlay onClick={() => changeIndex("left")}>
         {isRowHovered && <AngleIcon direction="left" className="prevSlide" />}
       </Overlay>

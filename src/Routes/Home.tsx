@@ -58,13 +58,6 @@ const Contents = styled.div`
   flex-direction: column;
 `;
 
-const SliderTitle = styled.span`
-  font-size: 28px;
-  font-weight: bolder;
-  padding-left: 95px;
-  margin: 12px 0px;
-`;
-
 const wrapperVariants: Variants = {
   initial: { opacity: 0 },
   animate: { opacity: 1 },
@@ -109,10 +102,12 @@ function Home() {
             <Overview>{nowPlaying?.results[0].overview}</Overview>
           </Banner>
           <Contents>
-            <SliderTitle>Now Playing</SliderTitle>
-            {nowPlayingMovies && <Slider movies={nowPlayingMovies.slice(1)} />}
-            <SliderTitle>Upcoming</SliderTitle>
-            {upcomingMovies && <Slider movies={upcomingMovies} />}
+            {nowPlayingMovies && (
+              <Slider movies={nowPlayingMovies.slice(1)} title="Now Playing" />
+            )}
+            {upcomingMovies && (
+              <Slider movies={upcomingMovies} title="Upcoming" />
+            )}
           </Contents>
           <MovieModal />
         </>

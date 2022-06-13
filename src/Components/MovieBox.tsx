@@ -104,6 +104,7 @@ function MovieBox({ movie }: IMovieBox) {
         onClick={() => onBoxClicked(movie.id)}
       >
         <ContentScreen bgphoto={backDropPath}>
+          {/* 3 layout id ? */}
           <AnimatePresence>
             {isHovered && (
               <PreviewModal
@@ -113,7 +114,10 @@ function MovieBox({ movie }: IMovieBox) {
                 exit="normal"
                 transition={{ type: "tween" }}
               >
-                <HoveredScreen bgphoto={backDropPath} />
+                <HoveredScreen
+                  layoutId={movie.id.toString()}
+                  bgphoto={backDropPath}
+                />
                 <HoveredContentInfo
                   variants={infoVariants}
                   initial="normal"
@@ -127,7 +131,10 @@ function MovieBox({ movie }: IMovieBox) {
           </AnimatePresence>
         </ContentScreen>
       </Wrapper>
-      <MovieModal layoutIdForModal={movie.id.toString()} />
+      <MovieModal
+        layoutIdForModal={movie.id.toString()}
+        isHovered={isHovered}
+      />
     </>
   );
 }

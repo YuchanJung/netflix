@@ -65,9 +65,10 @@ const modalVariants: Variants = {
 
 interface IModal {
   layoutIdForModal: string;
+  isHovered: boolean;
 }
 
-function MovieModal({ layoutIdForModal }: IModal) {
+function MovieModal({ layoutIdForModal, isHovered }: IModal) {
   const allMovies = useRecoilValue(allMoviesState);
   const moviePathMatch = useMatch("/movie/:movieId");
   const navigate = useNavigate();
@@ -81,6 +82,7 @@ function MovieModal({ layoutIdForModal }: IModal) {
     );
   return (
     <AnimatePresence>
+      {/* layoutId when hovered and basic animation when not hovered */}
       {clickedMovie && (
         <Overlay
           onClick={onOverlayClicked}
@@ -96,7 +98,7 @@ function MovieModal({ layoutIdForModal }: IModal) {
             initial="hidden"
             animate="visible"
             exit="hidden"
-            transition={{ type: "tween", duration: 0.15 }}
+            transition={{ type: "tween", duration: 1 }}
           >
             <Cover
               style={{

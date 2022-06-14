@@ -7,7 +7,6 @@ import { makeImagePath } from "../utils";
 import MovieModal from "./MovieModal";
 
 const Wrapper = styled(motion.div)`
-  cursor: pointer;
   width: 210px;
   height: 140px;
   max-height: 140px;
@@ -22,7 +21,8 @@ const Wrapper = styled(motion.div)`
   }
 `;
 
-const ContentScreen = styled(motion.div)<{ bgphoto: string }>`
+const BasicScreen = styled(motion.div)<{ bgphoto: string }>`
+  cursor: pointer;
   background-image: url(${(props) => props.bgphoto});
   background-size: cover;
   background-position: center center;
@@ -31,12 +31,16 @@ const ContentScreen = styled(motion.div)<{ bgphoto: string }>`
   border-radius: 5px;
 `;
 
+const ScreenForAnimation = styled(BasicScreen)`
+  position: absolute;
+`;
+
 const PreviewModal = styled(motion.div)`
   position: absolute;
   z-index: 1;
 `;
 
-const HoveredScreen = styled(ContentScreen)`
+const HoveredScreen = styled(BasicScreen)`
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
 `;
@@ -61,7 +65,7 @@ const modalVariants: Variants = {
     y: -50,
     scale: 1.4,
     transition: {
-      delay: 0.4,
+      delay: 2,
       duration: 0.3,
     },
   },
@@ -76,7 +80,7 @@ const infoVariants: Variants = {
     borderBottomLeftRadius: 5,
     borderBottomRightRadius: 5,
     transition: {
-      delay: 0.4,
+      delay: 2,
       duration: 0.3,
     },
   },
@@ -88,23 +92,37 @@ interface IMovieBox {
 
 function MovieBox({ movie }: IMovieBox) {
   const [isHovered, setIsHovered] = useState(false);
+  const [isHoverAnimationRunned, setIsHoverAnimationRunned] = useState(false);
+  const [isClicked, setIsClicked] = useState(false);
   const navigate = useNavigate();
   const backDropPath = movie.backdrop_path
     ? makeImagePath(movie.backdrop_path, "w500")
     : NEFLIX_LOGO_URL;
+  const toggleIsHovered = () => setIsHovered((prev) => !prev);
+  const toggleIsHoverAnimationRunned = () =>
+    setIsHoverAnimationRunned((prev) => !prev);
+  const toggleIsClicked = () => setIsClicked((prev) => !prev);
   const onBoxClicked = (movieId: number) => {
+    setIsHovered(false);
+    setIsClicked(true);
     navigate(`/movie/${movieId}`);
   };
-  const toggleIsHovered = () => setIsHovered((prev) => !prev);
   return (
     <>
       <Wrapper
-        onMouseEnter={toggleIsHovered}
-        onMouseLeave={toggleIsHovered}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => {
+          setIsHovered(false);
+          setIsHoverAnimationRunned(false);
+        }}
         onClick={() => onBoxClicked(movie.id)}
       >
-        <ContentScreen bgphoto={backDropPath}>
+        <BasicScreen bgphoto={backDropPath}>
           {/* 3 layout id ? */}
+          <ScreenForAnimation
+            layoutId={movie.id.toString()}
+            bgphoto={backDropPath}
+          />
           <AnimatePresence>
             {isHovered && (
               <PreviewModal
@@ -112,6 +130,10 @@ function MovieBox({ movie }: IMovieBox) {
                 initial="normal"
                 animate="hover"
                 exit="normal"
+                onAnimationComplete={() => {
+                  // need to debug
+                  setIsHoverAnimationRunned(true);
+                }}
                 transition={{ type: "tween" }}
               >
                 <HoveredScreen
@@ -129,11 +151,11 @@ function MovieBox({ movie }: IMovieBox) {
               </PreviewModal>
             )}
           </AnimatePresence>
-        </ContentScreen>
+        </BasicScreen>
       </Wrapper>
       <MovieModal
         layoutIdForModal={movie.id.toString()}
-        isHovered={isHovered}
+        isHovered={isHoverAnimationRunned}
       />
     </>
   );

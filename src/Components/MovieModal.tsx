@@ -5,7 +5,7 @@ import styled from "styled-components";
 import { allMoviesState } from "../atom";
 import { makeImagePath } from "../utils";
 
-const Overlay = styled(motion.div)`
+const Wrapper = styled.div`
   position: fixed;
   top: 0;
   left: 0;
@@ -13,11 +13,17 @@ const Overlay = styled(motion.div)`
   margin: 0 auto;
   width: 100vw;
   height: 100vh;
-  background-color: rgba(0, 0, 0, 0.1);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 2;
+`;
+
+const Overlay = styled(motion.div)`
+  position: absolute;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0);
 `;
 
 const Modal = styled(motion.div)`
@@ -26,6 +32,7 @@ const Modal = styled(motion.div)`
   background-color: ${(props) => props.theme.black.lighter};
   border-radius: 15px;
   overflow: hidden;
+  z-index: 3;
 `;
 
 const Cover = styled.div`
@@ -80,37 +87,55 @@ function MovieModal({ layoutIdForModal, isHovered }: IModal) {
     allMovies.find(
       (movie) => String(movie.id) === moviePathMatch.params.movieId
     );
+  console.log("hi", isHovered);
   return (
     <AnimatePresence>
       {/* layoutId when hovered and basic animation when not hovered */}
       {clickedMovie && (
-        <Overlay
-          onClick={onOverlayClicked}
-          variants={modalVariants}
-          initial="overlayHidden"
-          animate="visible"
-          exit="overlayHidden"
-          transition={{ duration: 0.15 }}
-        >
-          <Modal
+        <Wrapper>
+          <Overlay
+            onClick={onOverlayClicked}
             variants={modalVariants}
-            layoutId={layoutIdForModal}
-            initial="hidden"
+            initial="overlayHidden"
             animate="visible"
-            exit="hidden"
-            transition={{ type: "tween", duration: 1 }}
-          >
-            <Cover
-              style={{
-                backgroundImage: `
+            exit="overlayHidden"
+            transition={{ duration: 0.15 }}
+          />
+          {isHovered ? (
+            <Modal
+              layoutId={layoutIdForModal}
+              transition={{ type: "tween", duration: 1 }}
+            >
+              <Cover
+                style={{
+                  backgroundImage: `
                   linear-gradient(to top, black, transparent), 
                   url(${makeImagePath(clickedMovie.backdrop_path, "w500")})`,
-              }}
-            />
-            <Title>{clickedMovie.title}</Title>
-            <Overview>{clickedMovie.overview}</Overview>
-          </Modal>
-        </Overlay>
+                }}
+              />
+              <Title>{clickedMovie.title}</Title>
+              <Overview>{clickedMovie.overview}</Overview>
+            </Modal>
+          ) : (
+            <Modal
+              variants={modalVariants}
+              initial="hidden"
+              animate="visible"
+              exit="hidden"
+              transition={{ type: "tween", duration: 1 }}
+            >
+              <Cover
+                style={{
+                  backgroundImage: `
+                  linear-gradient(to top, black, transparent), 
+                  url(${makeImagePath(clickedMovie.backdrop_path, "w500")})`,
+                }}
+              />
+              <Title>{clickedMovie.title}</Title>
+              <Overview>{clickedMovie.overview}</Overview>
+            </Modal>
+          )}
+        </Wrapper>
       )}
     </AnimatePresence>
   );

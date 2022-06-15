@@ -37,10 +37,10 @@ const ScreenForAnimation = styled(BasicScreen)`
 
 const PreviewModal = styled(motion.div)`
   position: absolute;
-  z-index: 1;
 `;
 
 const HoveredScreen = styled(BasicScreen)`
+  z-index: 1;
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
 `;
@@ -65,7 +65,7 @@ const modalVariants: Variants = {
     y: -50,
     scale: 1.4,
     transition: {
-      delay: 2,
+      delay: 1,
       duration: 0.3,
     },
   },
@@ -80,7 +80,7 @@ const infoVariants: Variants = {
     borderBottomLeftRadius: 5,
     borderBottomRightRadius: 5,
     transition: {
-      delay: 2,
+      delay: 1,
       duration: 0.3,
     },
   },
@@ -98,65 +98,57 @@ function MovieBox({ movie }: IMovieBox) {
   const backDropPath = movie.backdrop_path
     ? makeImagePath(movie.backdrop_path, "w500")
     : NEFLIX_LOGO_URL;
-  const toggleIsHovered = () => setIsHovered((prev) => !prev);
-  const toggleIsHoverAnimationRunned = () =>
-    setIsHoverAnimationRunned((prev) => !prev);
   const toggleIsClicked = () => setIsClicked((prev) => !prev);
   const onBoxClicked = (movieId: number) => {
     setIsHovered(false);
     setIsClicked(true);
-    navigate(`/movie/${movieId}`);
+    navigate(`/movie/${movieId}`); 
+    // parameter state reset..? No. In Slider component, isRowHovered state is not reseted 
   };
   return (
     <>
       <Wrapper
         onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => {
-          setIsHovered(false);
-          setIsHoverAnimationRunned(false);
-        }}
+        onMouseLeave={() => setIsHovered(false)}
         onClick={() => onBoxClicked(movie.id)}
       >
         <BasicScreen bgphoto={backDropPath}>
           {/* 3 layout id ? */}
-          <ScreenForAnimation
-            layoutId={movie.id.toString()}
-            bgphoto={backDropPath}
-          />
-          <AnimatePresence>
-            {isHovered && (
-              <PreviewModal
-                variants={modalVariants}
-                initial="normal"
-                animate="hover"
-                exit="normal"
-                onAnimationComplete={() => {
-                  // need to debug
-                  setIsHoverAnimationRunned(true);
-                }}
-                transition={{ type: "tween" }}
-              >
-                <HoveredScreen
-                  layoutId={movie.id.toString()}
-                  bgphoto={backDropPath}
-                />
-                <HoveredContentInfo
-                  variants={infoVariants}
-                  initial="normal"
-                  animate="hover"
-                  exit="normal"
-                >
-                  <h4>{movie.title}</h4>
-                </HoveredContentInfo>
-              </PreviewModal>
-            )}
-          </AnimatePresence>
+          {/*onAnimationComplete={(definition) => {
+              if (definition === "hover") {
+                setIsHoverAnimationRunned(true);
+                console.log(isHoverAnimationRunned);
+              }
+              if (definition === "normal") {
+                setIsHoverAnimationRunned(false);
+                console.log(isHoverAnimationRunned);
+              }
+            }}*/}
+          <PreviewModal
+            variants={modalVariants}
+            initial="normal"
+            whileHover="hover"
+            transition={{ type: "tween" }}
+          >
+            <AnimatePresence>
+              {isHovered && (
+                <>
+                  <HoveredScreen bgphoto={backDropPath} />
+                  <HoveredContentInfo
+                    variants={infoVariants}
+                    initial="normal"
+                    animate="hover"
+                    exit="normal"
+                  >
+                    <h4>{movie.title}</h4>
+                  </HoveredContentInfo>
+                </>
+              )}
+            </AnimatePresence>
+          </PreviewModal>
         </BasicScreen>
       </Wrapper>
-      <MovieModal
-        layoutIdForModal={movie.id.toString()}
-        isHovered={isHoverAnimationRunned}
-      />
+      <MovieModal />
     </>
   );
 }

@@ -31,16 +31,11 @@ const BasicScreen = styled(motion.div)<{ bgphoto: string }>`
   border-radius: 5px;
 `;
 
-const ScreenForAnimation = styled(BasicScreen)`
-  position: absolute;
-`;
-
 const PreviewModal = styled(motion.div)`
   position: absolute;
 `;
 
 const HoveredScreen = styled(BasicScreen)`
-  z-index: 1;
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
 `;
@@ -64,8 +59,9 @@ const modalVariants: Variants = {
   hover: {
     y: -50,
     scale: 1.4,
+    zIndex: 2, // header z-index : 1
     transition: {
-      delay: 1,
+      delay: 0.6,
       duration: 0.3,
     },
   },
@@ -80,7 +76,7 @@ const infoVariants: Variants = {
     borderBottomLeftRadius: 5,
     borderBottomRightRadius: 5,
     transition: {
-      delay: 1,
+      delay: 0.6,
       duration: 0.3,
     },
   },
@@ -92,18 +88,14 @@ interface IMovieBox {
 
 function MovieBox({ movie }: IMovieBox) {
   const [isHovered, setIsHovered] = useState(false);
-  const [isHoverAnimationRunned, setIsHoverAnimationRunned] = useState(false);
-  const [isClicked, setIsClicked] = useState(false);
   const navigate = useNavigate();
   const backDropPath = movie.backdrop_path
     ? makeImagePath(movie.backdrop_path, "w500")
     : NEFLIX_LOGO_URL;
-  const toggleIsClicked = () => setIsClicked((prev) => !prev);
   const onBoxClicked = (movieId: number) => {
     setIsHovered(false);
-    setIsClicked(true);
-    navigate(`/movie/${movieId}`); 
-    // parameter state reset..? No. In Slider component, isRowHovered state is not reseted 
+    navigate(`/movie/${movieId}`);
+    // parameter state reset..? No. In Slider component, isRowHovered state is not reseted
   };
   return (
     <>
@@ -124,28 +116,27 @@ function MovieBox({ movie }: IMovieBox) {
                 console.log(isHoverAnimationRunned);
               }
             }}*/}
-          <PreviewModal
-            variants={modalVariants}
-            initial="normal"
-            whileHover="hover"
-            transition={{ type: "tween" }}
-          >
-            <AnimatePresence>
-              {isHovered && (
-                <>
-                  <HoveredScreen bgphoto={backDropPath} />
-                  <HoveredContentInfo
-                    variants={infoVariants}
-                    initial="normal"
-                    animate="hover"
-                    exit="normal"
-                  >
-                    <h4>{movie.title}</h4>
-                  </HoveredContentInfo>
-                </>
-              )}
-            </AnimatePresence>
-          </PreviewModal>
+          <AnimatePresence>
+            {isHovered && (
+              <PreviewModal
+                variants={modalVariants}
+                initial="normal"
+                animate="hover"
+                exit="normal"
+                transition={{ type: "tween" }}
+              >
+                <HoveredScreen bgphoto={backDropPath} />
+                <HoveredContentInfo
+                  variants={infoVariants}
+                  initial="normal"
+                  animate="hover"
+                  exit="normal"
+                >
+                  <h4>{movie.title}</h4>
+                </HoveredContentInfo>
+              </PreviewModal>
+            )}
+          </AnimatePresence>
         </BasicScreen>
       </Wrapper>
       <MovieModal />

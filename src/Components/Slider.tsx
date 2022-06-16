@@ -19,7 +19,7 @@ const Wrapper = styled.div`
 `;
 
 const Title = styled.h2`
-//  update style when only title hovered 
+  //  update style when only title hovered
   font-size: 24px;
   font-weight: bolder;
   width: 100%;

@@ -4,7 +4,7 @@ import { useState } from "react";
 import styled from "styled-components";
 import { IMovie } from "../api";
 import AngleIcon from "./Icons/AngleIcon";
-import MovieBox from "./MovieBox";
+import SliderContent from "./SliderContent";
 import PageIndicators from "./PageIndicators";
 
 const Wrapper = styled.div`
@@ -183,7 +183,7 @@ function Slider({ movies, title }: ISlider) {
             key={index} // do i need keyword of slider ?
           >
             {currentMovies.map((movie) => (
-              <MovieBox movie={movie} key={movie.id} />
+              <SliderContent movie={movie} key={movie.id} />
             ))}
           </Row>
         </AnimatePresence>

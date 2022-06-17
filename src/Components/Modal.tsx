@@ -20,9 +20,9 @@ const Overlay = styled(motion.div)`
   background-color: rgba(0, 0, 0, 0.1);
 `;
 
-const Modal = styled(motion.div)`
-  width: 40vw;
-  height: 80vh;
+const Container = styled(motion.div)`
+  width: 60vw;
+  height: 90vh;
   background-color: ${(props) => props.theme.black.lighter};
   border-radius: 15px;
   overflow: hidden;
@@ -88,7 +88,7 @@ function MovieModal() {
           exit="overlayHidden"
           transition={{ duration: 0.2 }}
         >
-          <Modal
+          <Container
             variants={modalVariants}
             initial="hidden"
             animate="visible"
@@ -104,7 +104,7 @@ function MovieModal() {
             />
             <Title>{clickedMovie.title}</Title>
             <Overview>{clickedMovie.overview}</Overview>
-          </Modal>
+          </Container>
         </Overlay>
       )}
     </AnimatePresence>

@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { IMovie, NEFLIX_LOGO_URL } from "../api";
 import { makeImagePath } from "../utils";
-import MovieModal from "./MovieModal";
+import Modal from "./Modal";
 
 const Wrapper = styled(motion.div)`
   width: 210px;
@@ -82,11 +82,11 @@ const infoVariants: Variants = {
   },
 };
 
-interface IMovieBox {
+interface ISliderContent {
   movie: IMovie;
 }
 
-function MovieBox({ movie }: IMovieBox) {
+function SliderContent({ movie }: ISliderContent) {
   const [isHovered, setIsHovered] = useState(false);
   const navigate = useNavigate();
   const backDropPath = movie.backdrop_path
@@ -139,9 +139,9 @@ function MovieBox({ movie }: IMovieBox) {
           </AnimatePresence>
         </BasicScreen>
       </Wrapper>
-      <MovieModal />
+      <Modal />
     </>
   );
 }
 
-export default MovieBox;
+export default SliderContent;

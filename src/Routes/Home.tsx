@@ -9,7 +9,6 @@ import {
   IGetMoviesResult,
 } from "../api";
 import { allMoviesState } from "../atom";
-import MovieModal from "../Components/MovieModal";
 import Slider from "../Components/Slider";
 import { makeImagePath } from "../utils";
 

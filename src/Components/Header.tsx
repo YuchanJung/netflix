@@ -4,10 +4,10 @@ import {
   useViewportScroll,
   Variants,
 } from "framer-motion";
-import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
-import { Link, useMatch, useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import { Link, useMatch } from "react-router-dom";
 import styled from "styled-components";
+import Search from "./Search";
 
 const Nav = styled(motion.nav)`
   display: flex;
@@ -66,33 +66,6 @@ const Circle = styled(motion.span)`
   margin: 0 auto;
 `;
 
-const Search = styled.form`
-  color: white;
-  display: flex;
-  align-items: center;
-  position: relative;
-  svg {
-    height: 25px;
-  }
-`;
-
-const Input = styled(motion.input)`
-  position: absolute;
-  width: 250px;
-  height: 30px;
-  right: 0;
-  transform-origin: right center;
-  background-color: black;
-  color: white;
-  border: 1px solid ${(props) => props.theme.white.lighter};
-  padding: 5px 10px;
-  padding-left: 30px;
-  font-size: 14px;
-  z-index: -1;
-`;
-
-const MagnifierSvg = styled(motion.svg)``;
-
 const logoVariants: Variants = {
   initial: {
     fillOpacity: 1,
@@ -110,27 +83,11 @@ const navVariant: Variants = {
   scroll: { backgroundColor: "rgba(0, 0, 0, 1)" },
 };
 
-interface IForm {
-  keyword: string;
-}
-
 function Header() {
   const homeMatch = useMatch("/");
   const tvMatch = useMatch("tv");
-  const inputAnimation = useAnimation();
   const navAnimation = useAnimation();
   const { scrollY } = useViewportScroll();
-  const { register, handleSubmit } = useForm<IForm>();
-  const [searchOpen, setSearchOpen] = useState(false);
-  const navigate = useNavigate();
-  const toggleSearch = () => {
-    if (searchOpen) {
-      inputAnimation.start({ scaleX: 0 });
-    } else {
-      inputAnimation.start({ scaleX: 1 });
-    }
-    setSearchOpen((prev) => !prev);
-  };
   useEffect(() => {
     scrollY.onChange(() => {
       if (scrollY.get() > 80) {
@@ -140,9 +97,6 @@ function Header() {
       }
     });
   }, [scrollY, navAnimation]);
-  const onValid = (data: IForm) => {
-    navigate(`search?keyword=${data.keyword}`);
-  };
   return (
     <Nav variants={navVariant} animate={navAnimation} initial="top">
       <Col>
@@ -169,29 +123,7 @@ function Header() {
         </Items>
       </Col>
       <Col>
-        <Search onSubmit={handleSubmit(onValid)}>
-          <MagnifierSvg
-            onClick={toggleSearch}
-            animate={{ x: searchOpen ? -220 : 0 }}
-            transition={{ type: "linear" }}
-            fill="currentColor"
-            viewBox="0 0 20 20"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              fillRule="evenodd"
-              d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-              clipRule="evenodd"
-            ></path>
-          </MagnifierSvg>
-          <Input
-            {...register("keyword", { required: true, minLength: 2 })}
-            initial={{ scaleX: 0 }}
-            animate={inputAnimation}
-            transition={{ type: "linear" }}
-            placeholder="Search for movie or tv show..."
-          />
-        </Search>
+        <Search />
       </Col>
     </Nav>
   );

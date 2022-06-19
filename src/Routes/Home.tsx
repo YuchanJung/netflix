@@ -16,6 +16,9 @@ const Wrapper = styled(motion.div)`
   width: 100%;
   height: 200vh;
   background-color: #141414;
+  &::-webkit-scrollbar {
+    // position ?
+  }
 `;
 
 const Loader = styled.div`

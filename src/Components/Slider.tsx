@@ -6,6 +6,8 @@ import { IMovie } from "../api";
 import AngleIcon from "./Icons/AngleIcon";
 import SliderContent from "./SliderContent";
 import PageIndicators from "./PageIndicators";
+import { useRecoilValue } from "recoil";
+import { offsetState } from "../atom";
 
 const Wrapper = styled.div`
   width: 100%;
@@ -34,11 +36,9 @@ const RowContainer = styled.div`
   justify-content: center;
 `;
 
-const Row = styled(motion.div)<{ windowinnerwidth: number }>`
+const Row = styled(motion.div)<{ offset: number }>`
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  /* grid-template-columns: repeat(${(props) =>
-    Math.floor(props.windowinnerwidth / 210)}, 1fr); */
+  grid-template-columns: repeat(${(props) => props.offset + 2}, 1fr);
   gap: 5px;
   position: absolute;
 `;
@@ -94,7 +94,11 @@ interface IRowVariants {
 }
 // const offset = 6;
 
-function returnCurrentMovies(movies: IMovie[], index: number, offset: number) {
+function returnCurrentMoviesByOffset(
+  movies: IMovie[],
+  index: number,
+  offset: number
+) {
   const totalLength = movies.length;
   const maxIndex = Math.ceil(totalLength / offset) - 1;
   const remainder = (maxIndex + 1) * offset - totalLength;
@@ -102,7 +106,7 @@ function returnCurrentMovies(movies: IMovie[], index: number, offset: number) {
     movies[index === 0 ? totalLength - 1 : index * offset - 1];
   const lastPreviewMovie =
     movies[index === maxIndex ? remainder : (index + 1) * offset];
-  let currentMovies = movies.slice(offset * index, offset * index + offset);
+  let currentMovies = movies.slice(offset * index, offset * (index + 1));
   if (index === maxIndex) {
     const remainderMovies = movies.slice(0, remainder);
     currentMovies.push(...remainderMovies);
@@ -113,7 +117,8 @@ function returnCurrentMovies(movies: IMovie[], index: number, offset: number) {
 }
 
 function Slider({ movies, title }: ISlider) {
-  const offset = 5;
+  const offset = useRecoilValue(offsetState);
+  console.log(offset);
   /* 
   const offset = Math.floor(window.innerWidth / 210); 
   have to update offset responsively 
@@ -130,7 +135,7 @@ function Slider({ movies, title }: ISlider) {
     direction,
     animationLength,
   };
-  const currentMovies = returnCurrentMovies(movies, index, offset);
+  const currentMovies = returnCurrentMoviesByOffset(movies, index, offset);
   const toggleAnimationRunning = () => setAnimationRunning((prev) => !prev);
   const toggleIsRowHovered = () => setIsRowHovered((prev) => !prev);
   const changeIndex = (direction: "left" | "right") => {
@@ -173,13 +178,13 @@ function Slider({ movies, title }: ISlider) {
           onExitComplete={toggleAnimationRunning}
         >
           <Row
-            windowinnerwidth={window.innerWidth}
+            offset={offset}
             custom={rowVariantsProps}
             variants={rowVariants}
             initial="hidden"
             animate="visible"
             exit="exit"
-            transition={{ type: "tween", duration: 0.6 }}
+            transition={{ type: "tween", duration: 2 }}
             key={index} // do i need keyword of slider ?
           >
             {currentMovies.map((movie) => (

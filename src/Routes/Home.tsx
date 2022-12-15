@@ -78,6 +78,7 @@ function Home() {
   );
   const nowPlayingMovies = nowPlaying?.results;
   const upcomingMovies = upcoming?.results;
+  const bannerMoive = nowPlaying?.results[0];
   useEffect(() => {
     setAllMovies((prev) => [
       ...prev,
@@ -98,10 +99,10 @@ function Home() {
       ) : (
         <>
           <Banner
-            bgphoto={makeImagePath(nowPlaying?.results[0].backdrop_path || "")}
+            bgphoto={makeImagePath(bannerMoive?.backdrop_path || "")}
           >
-            <Title>{nowPlaying?.results[0].title}</Title>
-            <Overview>{nowPlaying?.results[0].overview}</Overview>
+            <Title>{bannerMoive?.title}</Title>
+            <Overview>{bannerMoive?.overview}</Overview>
           </Banner>
           <Contents>
             {nowPlayingMovies && (

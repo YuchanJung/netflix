@@ -10,11 +10,11 @@ import {
 } from "../api";
 import { allMoviesState } from "../atom";
 import Slider from "../Components/Slider";
-import { makeImagePath } from "../utils";
+import { makeImagePath, returnRatioOfBannerHeightToWidth } from "../utils";
 
 const Wrapper = styled(motion.div)`
   width: 100%;
-  height: 200vh;
+  height: 200vw;
   background-color: #141414;
   &::-webkit-scrollbar {
     // position ?
@@ -28,8 +28,9 @@ const Loader = styled.div`
   align-items: center;
 `;
 
-const Banner = styled(motion.div)<{ bgphoto: string }>`
-  height: 100vh;
+const Banner = styled(motion.div)<{ bgphoto: string; ratio: number }>`
+  width: 100%;
+  height: ${(props) => props.ratio}vw;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -78,7 +79,10 @@ function Home() {
   );
   const nowPlayingMovies = nowPlaying?.results;
   const upcomingMovies = upcoming?.results;
-  const bannerMoive = nowPlaying?.results[0];
+  const bannerMovie = nowPlaying?.results[0];
+  const bannerMovieImageUrl = makeImagePath(bannerMovie?.backdrop_path || "");
+  const ratioOfBannerHeightToWidth =
+    returnRatioOfBannerHeightToWidth(bannerMovieImageUrl);
   useEffect(() => {
     setAllMovies((prev) => [
       ...prev,
@@ -99,10 +103,11 @@ function Home() {
       ) : (
         <>
           <Banner
-            bgphoto={makeImagePath(bannerMoive?.backdrop_path || "")}
+            bgphoto={bannerMovieImageUrl}
+            ratio={ratioOfBannerHeightToWidth}
           >
-            <Title>{bannerMoive?.title}</Title>
-            <Overview>{bannerMoive?.overview}</Overview>
+            <Title>{bannerMovie?.title}</Title>
+            <Overview>{bannerMovie?.overview}</Overview>
           </Banner>
           <Contents>
             {nowPlayingMovies && (

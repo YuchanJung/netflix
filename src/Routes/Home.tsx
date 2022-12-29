@@ -36,7 +36,11 @@ const Banner = styled(motion.div)<{ bgphoto: string; ratio: number }>`
   justify-content: center;
   padding: 60px;
   padding-left: 95px;
-  background-image: linear-gradient(rgba(0, 0, 0, 0), rgba(20, 20, 20, 1)),
+  background-image: linear-gradient(
+      rgba(30, 30, 30, 1),
+      rgba(0, 0, 0, 0),
+      rgba(20, 20, 20, 1)
+    ),
     url(${(props) => props.bgphoto});
   background-size: cover;
 `;
@@ -55,8 +59,8 @@ const Overview = styled.p`
 const Contents = styled.div`
   width: 100%;
   height: 120vh;
-  // position: relative;
-  // top: -100px;
+  position: relative;
+  top: -100px;
   display: flex;
   flex-direction: column;
 `;

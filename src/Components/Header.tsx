@@ -33,7 +33,7 @@ const Logo = styled(motion.svg)`
   width: 95px;
   height: 25px;
   fill: ${(props) => props.theme.red};
-  transform: scale(1.1);
+  transform: scale(1.05);
 `;
 
 const Items = styled.ul`
@@ -90,7 +90,7 @@ function Header() {
   const { scrollY } = useViewportScroll();
   useEffect(() => {
     scrollY.onChange(() => {
-      if (scrollY.get() > 80) {
+      if (scrollY.get() > 20) {
         navAnimation.start("scroll");
       } else {
         navAnimation.start("top");

@@ -6,8 +6,8 @@ import { IMovie } from "../api";
 import AngleIcon from "./Icons/AngleIcon";
 import SliderContent from "./SliderContent";
 import PageIndicators from "./PageIndicators";
-import { useRecoilValue } from "recoil";
-import { offsetState } from "../atom";
+import { useOffset } from "../hooks/useOffset";
+import { useWindowSize } from "../hooks/useWindowSize";
 
 const Wrapper = styled.div`
   width: 100%;
@@ -50,9 +50,9 @@ const Overlay = styled.button`
   align-items: center;
   position: absolute;
   top: 40px;
-  width: 95px;
+  width: 3.6%;
   height: 140px;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: red; //rgba(0, 0, 0, 0.5);
   color: white;
   &:nth-last-child(2) {
     padding-right: 20px;
@@ -117,8 +117,10 @@ function returnCurrentMoviesByOffset(
 }
 
 function Slider({ movies, title }: ISlider) {
-  const offset = useRecoilValue(offsetState);
+  const { windowInnerWidth, windowInnerHeight } = useWindowSize();
+  const offset = useOffset();
   console.log(offset);
+  // console.log(offset);
   /* 
   const offset = Math.floor(window.innerWidth / 210); 
   have to update offset responsively 

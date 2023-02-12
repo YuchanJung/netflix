@@ -43,16 +43,16 @@ const Row = styled(motion.div)<{ offset: number }>`
   position: absolute;
 `;
 
-const Overlay = styled.button`
+const Overlay = styled.button<{ width: number }>`
   cursor: pointer;
   display: flex;
   justify-content: center;
   align-items: center;
   position: absolute;
   top: 40px;
-  width: 3.6%;
+  width: ${props => props.width}px; // or 4% -> which is faster?
   height: 140px;
-  background-color: red; //rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.5);
   color: white;
   &:nth-last-child(2) {
     padding-right: 20px;
@@ -117,29 +117,44 @@ function returnCurrentMoviesByOffset(
 }
 
 function Slider({ movies, title }: ISlider) {
-  const { windowInnerWidth, windowInnerHeight } = useWindowSize();
+
   const offset = useOffset();
-  console.log(offset);
   // console.log(offset);
-  /* 
-  const offset = Math.floor(window.innerWidth / 210); 
-  have to update offset responsively 
-   */
+
+  // windowInnerWidth state for overlayWidth
+  const { windowInnerWidth, windowInnerHeight } = useWindowSize();
+  const overlayWidth = windowInnerWidth * 0.04;
+
   const [index, setIndex] = useState(0);
   const [animationRunning, setAnimationRunning] = useState(false);
-  const [animationLength, setAnimationLength] = useState(200);
+  
   const [direction, setDirection] = useState<"left" | "right">("right");
+  const [animationLength, setAnimationLength] = useState(200);
   const [isRowHovered, setIsRowHovered] = useState(false);
-  const totalLength = movies.length;
-  const maxIndex = Math.ceil(totalLength / offset) - 1;
-  const remainder = (maxIndex + 1) * offset - totalLength;
   const rowVariantsProps: IRowVariants = {
     direction,
     animationLength,
   };
+
+  /*
+  The whole movies are divided into some smaller movie list by offset. 
+  And currentMovies are the movie list that returned by index (ex 0, 1, 2...)
+  */ 
+
+  // params for returning current movies
+  const totalLength = movies.length;
+  const maxIndex = Math.ceil(totalLength / offset) - 1;
+  const remainder = (maxIndex + 1) * offset - totalLength;
+  
   const currentMovies = returnCurrentMoviesByOffset(movies, index, offset);
+
+  // 
   const toggleAnimationRunning = () => setAnimationRunning((prev) => !prev);
+
+  // 
   const toggleIsRowHovered = () => setIsRowHovered((prev) => !prev);
+
+  // change index of current
   const changeIndex = (direction: "left" | "right") => {
     if (movies) {
       if (animationRunning) return; // to prevent a bug that occurs when button is clicked too fast
@@ -195,10 +210,10 @@ function Slider({ movies, title }: ISlider) {
           </Row>
         </AnimatePresence>
       </RowContainer>
-      <Overlay onClick={() => changeIndex("left")}>
+      <Overlay onClick={() => changeIndex("left")} width={overlayWidth}>
         {isRowHovered && <AngleIcon direction="left" className="prevSlide" />}
       </Overlay>
-      <Overlay onClick={() => changeIndex("right")}>
+      <Overlay onClick={() => changeIndex("right")} width={overlayWidth}>
         {isRowHovered && <AngleIcon direction="right" className="nextSlide" />}
       </Overlay>
     </Wrapper>

@@ -3,13 +3,14 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { IMovie, NEFLIX_LOGO_URL } from "../api";
+import { useOffset } from "../hooks/useOffset";
+import { useWindowSize } from "../hooks/useWindowSize";
 import { makeImagePath } from "../utils";
 import Modal from "./Modal";
 
-const Wrapper = styled(motion.div)`
-  width: 210px;
-  height: 140px;
-  max-height: 140px;
+const Wrapper = styled(motion.div)<{ width: number; height: number }>`
+  width: ${(props) => props.width}px;
+  height: ${(props) => props.height}px;
   font-size: 36px;
   display: flex;
   flex-direction: column;
@@ -26,8 +27,8 @@ const BasicScreen = styled(motion.div)<{ bgphoto: string }>`
   background-image: url(${(props) => props.bgphoto});
   background-size: cover;
   background-position: center center;
-  width: 210px;
-  min-height: 140px;
+  width: 100%;
+  height: 100%;
   border-radius: 5px;
 `;
 
@@ -87,6 +88,12 @@ interface ISliderContent {
 }
 
 function SliderContent({ movie }: ISliderContent) {
+  const offset = useOffset();
+  const { windowInnerWidth, windowInnerHeight } = useWindowSize();
+  const wrapperWidthRatio = 92 / (offset * 1.03 + 0.03);
+  const wrapperWidth = (windowInnerWidth * wrapperWidthRatio) / 100;
+  const wrapperHeight = wrapperWidth * 0.58;
+
   const [isHovered, setIsHovered] = useState(false);
   const navigate = useNavigate();
   const backDropPath = movie.backdrop_path
@@ -100,6 +107,8 @@ function SliderContent({ movie }: ISliderContent) {
   return (
     <>
       <Wrapper
+        width={wrapperWidth}
+        height={wrapperHeight}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         onClick={() => onBoxClicked(movie.id)}

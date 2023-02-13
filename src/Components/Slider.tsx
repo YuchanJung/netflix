@@ -36,22 +36,22 @@ const RowContainer = styled.div`
   justify-content: center;
 `;
 
-const Row = styled(motion.div)<{ offset: number }>`
+const Row = styled(motion.div)<{ offset: number; gapWidth: number }>`
   display: grid;
   grid-template-columns: repeat(${(props) => props.offset + 2}, 1fr);
-  gap: 5px;
+  gap: ${(props) => props.gapWidth}px;
   position: absolute;
 `;
 
-const Overlay = styled.button<{ width: number }>`
+const Overlay = styled.button<{ width: number; height: number }>`
   cursor: pointer;
   display: flex;
   justify-content: center;
   align-items: center;
   position: absolute;
   top: 40px;
-  width: ${props => props.width}px; // or 4% -> which is faster?
-  height: 140px;
+  width: ${(props) => props.width}px;
+  height: ${(props) => props.height}px;
   background-color: rgba(0, 0, 0, 0.5);
   color: white;
   &:nth-last-child(2) {
@@ -117,47 +117,54 @@ function returnCurrentMoviesByOffset(
 }
 
 function Slider({ movies, title }: ISlider) {
-
   const offset = useOffset();
   // console.log(offset);
 
-  // windowInnerWidth state for overlayWidth
+  // windowInnerWidth state for overlayWidth and gapWidth
   const { windowInnerWidth, windowInnerHeight } = useWindowSize();
-  const overlayWidth = windowInnerWidth * 0.04;
+  const sliderContentWidthRatio = 92 / (offset * 1.03 + 0.03);
 
-  const [index, setIndex] = useState(0);
+  const overlayWidth = windowInnerWidth * 0.04;
+  const overlayHeight = windowInnerWidth * sliderContentWidthRatio / 100 * 0.58;
+  const gapWidthRatio = (92 / (offset * 1.03 + 0.03)) * 0.03;
+  const gapWidth = (windowInnerWidth * gapWidthRatio) / 100;
+
+  // when the row (slider) is hovered, page indicators of it will be displayed
+  const [isRowHovered, setIsRowHovered] = useState(false);
+  const toggleIsRowHovered = () => setIsRowHovered((prev) => !prev);
+
+  // animationRunning state prevent a bug that occurs when button is clicked too fast
   const [animationRunning, setAnimationRunning] = useState(false);
-  
+  const toggleAnimationRunning = () => setAnimationRunning((prev) => !prev);
+
+  // row info
+  const [index, setIndex] = useState(0);
   const [direction, setDirection] = useState<"left" | "right">("right");
   const [animationLength, setAnimationLength] = useState(200);
-  const [isRowHovered, setIsRowHovered] = useState(false);
+
+  // props for rowVariants
   const rowVariantsProps: IRowVariants = {
     direction,
     animationLength,
   };
 
-  /*
-  The whole movies are divided into some smaller movie list by offset. 
-  And currentMovies are the movie list that returned by index (ex 0, 1, 2...)
-  */ 
-
-  // params for returning current movies
+  // length of all movies
   const totalLength = movies.length;
+
+  // max index for page indicators, remainder for animation length
   const maxIndex = Math.ceil(totalLength / offset) - 1;
   const remainder = (maxIndex + 1) * offset - totalLength;
-  
+
+  /*
+  The whole movies are divided into some smaller movie lists by offset. 
+  And currentMovies are the movie list that returned by index (ex 0, 1, 2...)
+  */
   const currentMovies = returnCurrentMoviesByOffset(movies, index, offset);
 
-  // 
-  const toggleAnimationRunning = () => setAnimationRunning((prev) => !prev);
-
-  // 
-  const toggleIsRowHovered = () => setIsRowHovered((prev) => !prev);
-
-  // change index of current
+  // change index. if "changeIndex" is called, currentMovies will be changed automatically
   const changeIndex = (direction: "left" | "right") => {
     if (movies) {
-      if (animationRunning) return; // to prevent a bug that occurs when button is clicked too fast
+      if (animationRunning) return;
       toggleAnimationRunning();
       setDirection(direction);
       if (direction === "right") {
@@ -181,6 +188,7 @@ function Slider({ movies, title }: ISlider) {
       }
     }
   };
+
   return (
     <Wrapper
       onMouseEnter={toggleIsRowHovered}
@@ -196,6 +204,7 @@ function Slider({ movies, title }: ISlider) {
         >
           <Row
             offset={offset}
+            gapWidth={gapWidth}
             custom={rowVariantsProps}
             variants={rowVariants}
             initial="hidden"
@@ -210,10 +219,18 @@ function Slider({ movies, title }: ISlider) {
           </Row>
         </AnimatePresence>
       </RowContainer>
-      <Overlay onClick={() => changeIndex("left")} width={overlayWidth}>
+      <Overlay
+        onClick={() => changeIndex("left")}
+        width={overlayWidth}
+        height={overlayHeight}
+      >
         {isRowHovered && <AngleIcon direction="left" className="prevSlide" />}
       </Overlay>
-      <Overlay onClick={() => changeIndex("right")} width={overlayWidth}>
+      <Overlay
+        onClick={() => changeIndex("right")}
+        width={overlayWidth}
+        height={overlayHeight}
+      >
         {isRowHovered && <AngleIcon direction="right" className="nextSlide" />}
       </Overlay>
     </Wrapper>

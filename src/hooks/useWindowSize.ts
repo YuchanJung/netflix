@@ -9,14 +9,17 @@ interface Size {
 export function useWindowSize(): Size {
   // Initialize state with undefined width/height so server and client renders match
   // Learn more here: https://joshwcomeau.com/react/the-perils-of-rehydration/
+
+  // replace "window.innerWidth" with "document.documentElement.clientWidth" to not count scrollbar size
   const [windowSize, setWindowSize] = useState<Size>({
-    windowInnerWidth: window.innerWidth,
-    windowInnerHeight: window.innerHeight,
+    windowInnerWidth: document.documentElement.clientWidth,
+    windowInnerHeight: document.documentElement.clientHeight,
   });
+
   const handleResize = () => {
     setWindowSize({
-      windowInnerWidth: window.innerWidth,
-      windowInnerHeight: window.innerHeight,
+      windowInnerWidth: document.documentElement.clientWidth,
+      windowInnerHeight: document.documentElement.clientHeight,
     });
   };
   useEffect(() => {

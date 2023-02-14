@@ -8,58 +8,60 @@ import SliderContent from "./SliderContent";
 import PageIndicators from "./PageIndicators";
 import { useOffset } from "../hooks/useOffset";
 import { useWindowSize } from "../hooks/useWindowSize";
+import { returnSliderInfo } from "../utils";
 
 const Wrapper = styled.div`
   width: 100%;
-  height: 180px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   position: relative;
-  margin: 25px 0;
+  margin: 1.5% 0;
 `;
 
-const Title = styled.h2`
+const Title = styled.h2<{ gapWidth: number }>`
   //  update style when only title hovered
-  font-size: 24px;
+  font-size: 1.7vw;
   font-weight: bolder;
   width: 100%;
-  height: 40px;
-  padding: 0 95px;
+  padding: 0% 0% 0.8% calc(4% + ${(props) => props.gapWidth}px);
 `;
 
-const RowContainer = styled.div`
+const RowContainer = styled.div<{ height: number }>`
   width: 100%;
-  height: 140px; // maybe change responsively
+  height: ${(props) => props.height}px; // maybe change responsively
   display: flex;
   justify-content: center;
+  position: relative; // for slider content height
 `;
 
 const Row = styled(motion.div)<{ offset: number; gapWidth: number }>`
+  height: 100%;
   display: grid;
   grid-template-columns: repeat(${(props) => props.offset + 2}, 1fr);
   gap: ${(props) => props.gapWidth}px;
   position: absolute;
 `;
 
-const Overlay = styled.button<{ width: number; height: number }>`
+const Overlay = styled.button<{ height: number }>`
   cursor: pointer;
   display: flex;
   justify-content: center;
   align-items: center;
   position: absolute;
-  top: 40px;
-  width: ${(props) => props.width}px;
+  width: calc(4% + 0.5px);
   height: ${(props) => props.height}px;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.7);
   color: white;
   &:nth-last-child(2) {
-    padding-right: 20px;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
     left: 0;
   }
   &:last-child {
-    padding-left: 20px;
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
     right: 0;
   }
 `;
@@ -119,15 +121,11 @@ function returnCurrentMoviesByOffset(
 function Slider({ movies, title }: ISlider) {
   const offset = useOffset();
   // console.log(offset);
-
-  // windowInnerWidth state for overlayWidth and gapWidth
-  const { windowInnerWidth, windowInnerHeight } = useWindowSize();
-  const sliderContentWidthRatio = 92 / (offset * 1.03 + 0.03);
-
-  const overlayWidth = windowInnerWidth * 0.04;
-  const overlayHeight = windowInnerWidth * sliderContentWidthRatio / 100 * 0.58;
-  const gapWidthRatio = (92 / (offset * 1.03 + 0.03)) * 0.03;
-  const gapWidth = (windowInnerWidth * gapWidthRatio) / 100;
+  const windowInnerWidth = useWindowSize().windowInnerWidth;
+  const { sliderContentHeight, gapWidth } = returnSliderInfo(
+    offset,
+    windowInnerWidth
+  );
 
   // when the row (slider) is hovered, page indicators of it will be displayed
   const [isRowHovered, setIsRowHovered] = useState(false);
@@ -194,9 +192,11 @@ function Slider({ movies, title }: ISlider) {
       onMouseEnter={toggleIsRowHovered}
       onMouseLeave={toggleIsRowHovered}
     >
-      <Title>{title}</Title>
-      {isRowHovered && <PageIndicators index={index} maxIndex={maxIndex} />}
-      <RowContainer>
+      <Title gapWidth={gapWidth}>{title}</Title>
+      {isRowHovered && (
+        <PageIndicators index={index} maxIndex={maxIndex} gapWidth={gapWidth} />
+      )}
+      <RowContainer height={sliderContentHeight}>
         <AnimatePresence
           custom={rowVariantsProps}
           initial={false}
@@ -218,21 +218,21 @@ function Slider({ movies, title }: ISlider) {
             ))}
           </Row>
         </AnimatePresence>
+        <Overlay
+          onClick={() => changeIndex("left")}
+          height={sliderContentHeight}
+        >
+          {isRowHovered && <AngleIcon direction="left" className="prevSlide" />}
+        </Overlay>
+        <Overlay
+          onClick={() => changeIndex("right")}
+          height={sliderContentHeight}
+        >
+          {isRowHovered && (
+            <AngleIcon direction="right" className="nextSlide" />
+          )}
+        </Overlay>
       </RowContainer>
-      <Overlay
-        onClick={() => changeIndex("left")}
-        width={overlayWidth}
-        height={overlayHeight}
-      >
-        {isRowHovered && <AngleIcon direction="left" className="prevSlide" />}
-      </Overlay>
-      <Overlay
-        onClick={() => changeIndex("right")}
-        width={overlayWidth}
-        height={overlayHeight}
-      >
-        {isRowHovered && <AngleIcon direction="right" className="nextSlide" />}
-      </Overlay>
     </Wrapper>
   );
 }

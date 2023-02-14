@@ -5,12 +5,12 @@ import styled from "styled-components";
 import { IMovie, NEFLIX_LOGO_URL } from "../api";
 import { useOffset } from "../hooks/useOffset";
 import { useWindowSize } from "../hooks/useWindowSize";
-import { makeImagePath } from "../utils";
+import { makeImagePath, returnSliderInfo } from "../utils";
 import Modal from "./Modal";
 
-const Wrapper = styled(motion.div)<{ width: number; height: number }>`
+const Wrapper = styled(motion.div)<{ width: number }>`
   width: ${(props) => props.width}px;
-  height: ${(props) => props.height}px;
+  height: 100%;
   font-size: 36px;
   display: flex;
   flex-direction: column;
@@ -89,10 +89,8 @@ interface ISliderContent {
 
 function SliderContent({ movie }: ISliderContent) {
   const offset = useOffset();
-  const { windowInnerWidth, windowInnerHeight } = useWindowSize();
-  const wrapperWidthRatio = 92 / (offset * 1.03 + 0.03);
-  const wrapperWidth = (windowInnerWidth * wrapperWidthRatio) / 100;
-  const wrapperHeight = wrapperWidth * 0.58;
+  const windowInnerWidth = useWindowSize().windowInnerWidth;
+  const { sliderContentWidth } = returnSliderInfo(offset, windowInnerWidth);
 
   const [isHovered, setIsHovered] = useState(false);
   const navigate = useNavigate();
@@ -107,8 +105,7 @@ function SliderContent({ movie }: ISliderContent) {
   return (
     <>
       <Wrapper
-        width={wrapperWidth}
-        height={wrapperHeight}
+        width={sliderContentWidth}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         onClick={() => onBoxClicked(movie.id)}

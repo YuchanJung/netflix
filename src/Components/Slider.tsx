@@ -70,8 +70,8 @@ const rowVariants: Variants = {
   hidden: (props: IRowVariants) => ({
     x:
       props.direction === "left"
-        ? -window.outerWidth + props.animationLength
-        : window.outerWidth - props.animationLength,
+        ? -document.documentElement.clientWidth + props.animationLength
+        : document.documentElement.clientWidth - props.animationLength,
   }),
   visible: {
     x: 0,
@@ -79,8 +79,8 @@ const rowVariants: Variants = {
   exit: (props: IRowVariants) => ({
     x:
       props.direction === "left"
-        ? window.outerWidth - props.animationLength
-        : -window.outerWidth + props.animationLength,
+        ? document.documentElement.clientWidth - props.animationLength
+        : -document.documentElement.clientWidth + props.animationLength,
   }),
   // 170 have to be changed responsively
 };
@@ -121,11 +121,9 @@ function returnCurrentMoviesByOffset(
 function Slider({ movies, title }: ISlider) {
   const offset = useOffset();
   // console.log(offset);
-  const windowInnerWidth = useWindowSize().windowInnerWidth;
-  const { sliderContentHeight, gapWidth } = returnSliderInfo(
-    offset,
-    windowInnerWidth
-  );
+  const { windowInnerWidth } = useWindowSize();
+  const { sliderContentWidth, sliderContentHeight, gapWidth } =
+    returnSliderInfo(offset, windowInnerWidth);
 
   // when the row (slider) is hovered, page indicators of it will be displayed
   const [isRowHovered, setIsRowHovered] = useState(false);
@@ -138,7 +136,9 @@ function Slider({ movies, title }: ISlider) {
   // row info
   const [index, setIndex] = useState(0);
   const [direction, setDirection] = useState<"left" | "right">("right");
-  const [animationLength, setAnimationLength] = useState(200);
+  const [animationLength, setAnimationLength] = useState(
+    windowInnerWidth * 0.08 + gapWidth
+  );
 
   // props for rowVariants
   const rowVariantsProps: IRowVariants = {
@@ -168,19 +168,27 @@ function Slider({ movies, title }: ISlider) {
       if (direction === "right") {
         setIndex((prev) => {
           if (prev === maxIndex) {
-            setAnimationLength(205 + 215 * remainder);
+            setAnimationLength(
+              windowInnerWidth * 0.08 +
+                gapWidth +
+                remainder * (sliderContentWidth + gapWidth)
+            );
             return 0;
           }
-          setAnimationLength(205);
+          setAnimationLength(windowInnerWidth * 0.08 + gapWidth);
           return prev + 1;
         });
       } else {
         setIndex((prev) => {
           if (prev === 0) {
-            setAnimationLength(205 + 215 * remainder);
+            setAnimationLength(
+              windowInnerWidth * 0.08 +
+                gapWidth +
+                remainder * (sliderContentWidth + gapWidth)
+            );
             return maxIndex;
           }
-          setAnimationLength(205);
+          setAnimationLength(windowInnerWidth * 0.08 + gapWidth);
           return prev - 1;
         });
       }
@@ -210,8 +218,8 @@ function Slider({ movies, title }: ISlider) {
             initial="hidden"
             animate="visible"
             exit="exit"
-            transition={{ type: "tween", duration: 2 }}
-            key={index} // do i need keyword of slider ?
+            transition={{ type: "tween", duration: 0.8 }}
+            key={index} // required
           >
             {currentMovies.map((movie) => (
               <SliderContent movie={movie} key={movie.id} />

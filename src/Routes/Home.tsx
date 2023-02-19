@@ -35,7 +35,7 @@ const Banner = styled(motion.div)<{ bgphoto: string; ratio: number }>`
   flex-direction: column;
   justify-content: center;
   padding: 60px;
-  padding-left: 95px;
+  padding-left: 4%;
   background-image: linear-gradient(
       rgba(30, 30, 30, 1),
       rgba(0, 0, 0, 0),
@@ -46,13 +46,13 @@ const Banner = styled(motion.div)<{ bgphoto: string; ratio: number }>`
 `;
 
 const Title = styled.h2`
-  font-size: 68px;
-  margin-bottom: 50px;
+  font-size: 4vw;
+  margin-bottom: 4%;
   width: 60%;
 `;
 
 const Overview = styled.p`
-  font-size: 28px;
+  font-size: 1.8vw;
   width: 50%;
 `;
 
@@ -60,7 +60,7 @@ const Contents = styled.div`
   width: 100%;
   height: 120vh;
   position: relative;
-  top: -100px;
+  top: -10vw;
   display: flex;
   flex-direction: column;
 `;
